@@ -1,0 +1,113 @@
+Description:  Creating a EC2 with import functions of VPCid and subnet id
+
+Parameters:
+  EC2Name:
+    Description: EC2s name public
+    Type: String
+    Default: a4-ec2-public
+
+  EC2NamePrivate:
+    Description: EC2s name private
+    Type: String
+    Default: a4-ec2-private
+  Instancetype:
+    Description:  Free Instance type for EC2
+    Type: String
+    Default: t2.micro
+
+  Keypair:
+    Description: Key pair for EC2
+    Type: String
+    Default: cactus
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      HVM64: "ami-0022f774911c1d690"
+      HVMG2: "ami-0e449176cecc3e577"
+    us-east-2:
+      HVM64: "ami-0fa49cc9dc8d62c84"
+      HVMG2: "ami-02cb75f995890cd96"
+Resources:
+  SecurityGroupPublic1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: A4-VPCID
+      GroupDescription: Security group for allowing ICMP (for ping) and ssh traffic into your instance.
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 184.146.8.52/32
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      SecurityGroupIds:
+        - Ref: SecurityGroupPublic1
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - HVM64
+      InstanceType: !Ref Instancetype
+      KeyName: !Ref Keypair
+      SubnetId:
+        Fn::ImportValue: A4-PUBLICSUBNETID1
+      Tags:
+        - Key: Name
+          Value: !Ref EC2Name
+
+  SecurityGroupPrivate1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: A4-VPCID
+      GroupDescription: Security group for allowing ICMP (for ping) and ssh traffic into your instance.
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.192.0.0/24
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+  EC2PrivateInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      SecurityGroupIds:
+        - Ref: SecurityGroupPrivate1
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - HVM64
+      InstanceType: !Ref Instancetype
+      KeyName: !Ref Keypair
+      SubnetId:
+        Fn::ImportValue: A4-PRIVATESUBNETID1
+      Tags:
+        - Key: Name
+          Value: !Ref EC2NamePrivate
+  MyEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref EC2Instance
+
+
+Outputs:
+  InstanceID:
+    Description: A reference to the created EC2 INSTANCE ID
+    Value: !Ref EC2Instance
+    Export:
+      Name: EC2-ID
+  PublicIp:
+    Description: Server Public IP
+    Value: !GetAtt EC2Instance.PublicIp
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicIp"

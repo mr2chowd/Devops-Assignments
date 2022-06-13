@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda function creation
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: >
+          def handler(event, context):
+            return "hiiiii"
+      Description: AWS Lambda function
+      FunctionName: lambda-function
+      Handler: index.handler
+      MemorySize: 256
+      Role: arn:aws:iam::744451519362:role/cf
+      Runtime: python3.6
+      Timeout: 120
