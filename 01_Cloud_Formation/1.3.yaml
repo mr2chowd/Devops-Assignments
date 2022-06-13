@@ -1,0 +1,15 @@
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket name
+
+Description: Creating an S3 bucket with minimal inputs
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+                  - '${AWS::AccountId}-${s3bucket}'
+                  - s3bucket: !Ref BucketName
+#      VersioningConfiguration:
+#        Status: Enabled
