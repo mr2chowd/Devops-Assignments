@@ -8,6 +8,10 @@ find the assignement folder:
   create a stack :
   aws cloudformation create-stack --stack-name cac --template-body file://1.1_Create_S3.yaml
 
+  aws cloudformation deploy \
+  --stack-name demo \
+  --template-file 1.2.yaml --parameter-overrides file://test.json  \
+
   create a ec2-key-pair:
   aws ec2 create-key-pair --key-name vpc-key-pair --query 'KeyMaterial' --output text > vpc-key-pair.pem
 

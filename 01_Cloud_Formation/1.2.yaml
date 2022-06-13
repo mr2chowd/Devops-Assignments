@@ -1,12 +1,13 @@
-#Parameters:
-#  BucketName:
-#    Type: String
-#    Description: dip-bucket-cf2
-#    Default: dip-bucket-cf200
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket name
+
+Description: Creating an S3 bucket with minimal inputs
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
-#    Properties:
-#      BucketName: !Ref BucketName
+    Properties:
+      BucketName: !Ref BucketName
 #      VersioningConfiguration:
 #        Status: Enabled
