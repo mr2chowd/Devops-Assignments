@@ -1,1 +1,4 @@
-hey how are you
+Description: Creating an S3 bucket with minimal inputs
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket

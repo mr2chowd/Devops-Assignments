@@ -1,0 +1,12 @@
+#Parameters:
+#  BucketName:
+#    Type: String
+#    Description: dip-bucket-cf2
+#    Default: dip-bucket-cf200
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+#    Properties:
+#      BucketName: !Ref BucketName
+#      VersioningConfiguration:
+#        Status: Enabled
