@@ -1,0 +1,11 @@
+Description: Creating an IAM user and assigned a managed policy
+Resources:
+  Createiamuser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: Cactus2
+      LoginProfile:
+        Password: Cactusinlove2022!
+        PasswordResetRequired: False
+      ManagedPolicyArns:
+        - Fn::ImportValue: ManagedPolicyA

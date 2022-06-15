@@ -1,0 +1,11 @@
+
+**Assume role** 
+aws sts assume-role --role-arn arn:aws:iam::744451519362:role/assignmentrole --role-session-name "332sessi
+on" --profile default > config1.txt
+
+assume role second step: 
+
+export AWS_ACCESS_KEY_ID=ASIA22VGEWOBIOB5PAER
+export AWS_SECRET_ACCESS_KEY=XoGtsr1r8p9Ij77gXbUxLmajZaSDB7U0n/IsSQSQ
+export AWS_SESSION_TOKEN=IQoJb3JpZ2luX2VjEJP//////////wEaCXVzLWVhc3QtMSJIMEYCIQDDUuRST16RyMnjwt16D5I+gJbEB4KVCcsNtgVc/5mtOQIhAOAXgi/ANQOH0nDsez2x23Wkbzmgwszq1MTG+szz+nPbKqACCJz//////////wEQABoMNzQ0NDUxNTE5MzYyIgzem1DF+qlAkakuYPEq9AE9w/hfhzZFMriuq1+Nl3rqKcgyQtlUqUFjrgcZY20NPg+N9t6oaRstx7MM6G9q4NQkD56dgDEPdnzXwwq9l7olWkkHD+aHc6zGiw0vU2CHgVIHHP0xzkA75gxcBOLF3MSrpi+i659LwCOAQVlwRHlhPH+r+agYMxyELRmgke5XWnCB55mQDlV5izJjif83GCPShL/vc2y3t3D47Sxk8QCYD6S1s1iDVtmGYniLv+8sSfXPBaNDu9Xeqe9hMHmcTqiWLc0r+tI2fZr6FmQGHGXaeTEuJjdljYPuHSaDfY4Sr29/07SsVLxrAOmU8sZag+pmCsVkMLCOpZUGOpwBvmzEbmdOfWzgm4jUeD4plrLykEutq8sZVL4eAwtB8i5wEEagpUsvkt/d61EIG/FzKAn1nIZWc1szGOKNvGdRtgZshAhWTdavijeoR9X/UvhkUlEGLX6mUCjsKp9DEGu0Rjlz6oNi3Ocwp8H3SCO/IbP1b/81Zil3uPZpCEf2NLpFTMWSOcFgvVQXnXj6Y2ZkXC+n4M4TAU2/6FcV
+

@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey" : "RoleName",
+    "ParameterValue" : "RoleToAccessS3demo"
+  },
+  {
+    "ParameterKey" : "RoleName",
+    "ParameterValue" : "assignmentrole"
+  }
+]

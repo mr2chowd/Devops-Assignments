@@ -1,6 +1,9 @@
 **-Important commands**
 find the assignement folder:
-  
+
+aws cloudformation update-termination-protection \
+--stack-name my-stack \
+--enable-termination-protection
 
   Validate a template:
   aws cloudformation validate-template --template-body file://lambdawithcf.yaml
@@ -17,3 +20,8 @@ find the assignement folder:
 
 **Important Links:**
 - https://nickolaskraus.io/articles/creating-an-amazon-api-gateway-with-a-lambda-integration-using-cloudformation/
+**- S3 Bucket CF requirements:** 
+  - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
+
+**Pseudo Parameters references:**
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/pseudo-parameter-reference.html

@@ -1,0 +1,29 @@
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket name
+  MyPreferredRegion:
+    Type: String
+    Description: dynamic region
+
+Conditions:
+  myRegion : !Equals
+    - !Ref MyPreferredRegion
+    - !Ref AWS::Region
+
+Description: Creating an S3 bucket with minimal inputs
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !If
+                    - myRegion
+                    - !Join
+                        - '-'
+                        - - !Ref AWS::AccountId
+                          - !Ref BucketName
+                    - !Join
+                        - '-'
+                        - - !Ref AWS::Region
+                          - !Ref BucketName
+

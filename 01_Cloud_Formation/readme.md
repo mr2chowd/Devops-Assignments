@@ -11,6 +11,14 @@ Lab 1.1.1: CloudFormation Template Requirements
 Create the most minimal CFN template possible that can be used to create an AWS Simple Storage Service (S3) Bucket.
 
 Always write your CloudFormation templates in YAML.
+> Answer:
+```yaml
+Description: Creating an S3 bucket with minimal inputs
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+
+```
 
 Launch a Stack by using the AWS CLI tool to run the template. Use your preferred region.
 
@@ -49,12 +57,68 @@ Create a new stack with the same stack name, but this time deploying to some reg
 
 Commit the changes to your Github repo.
 
+>Answer:
+
+```yaml
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket name
+  MyPreferredRegion:
+    Type: String
+    Description: dynamic region
+
+Conditions:
+  myRegion : !Equals
+    - !Ref MyPreferredRegion
+    - !Ref AWS::Region
+
+Description: Creating an S3 bucket with minimal inputs
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !If
+        - myRegion
+        - !Join
+          - '-'
+          - - !Ref AWS::AccountId
+            - !Ref BucketName
+        - !Join
+          - '-'
+          - - !Ref AWS::Region
+            - !Ref BucketName
+
+
+
+```
+
 Lab 1.1.5: Termination Protection; Clean up
 Before deleting this lesson's Stacks, apply Termination Protection to one of them.
 
+>Answer: 
+"""
+aws cloudformation update-termination-protection \
+--stack-name demo2312 \
+--enable-termination-protection
+ """
+
 Try to delete the Stack using the AWS CLI. What happens?
+``` 
+
+An error occurred (ValidationError) when calling the DeleteStack operation: Stack [demo2312] cannot be deleted while Termination
+Protection is enabled 
+```
+
 
 Remove termination protection and try again.
+
+```
+aws cloudformation update-termination-protection \
+--stack-name demo2312 \
+--no-enable-termination-protection
+```
 
 List the S3 buckets in both regions once this lesson's Stacks have been deleted to ensure their removal.
 
@@ -89,23 +153,118 @@ Attach the policy to the user via the template.
 Use a CFN Parameter to set the user's name
 
 Create the Stack.
+>Answer:
+```yaml
+
+Description: Creating an IAM user and assigned a managed policy
+Resources:
+  Managedpolicy1:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for creating for read action against all s3 buckets
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:Get*
+              - s3:List*
+              - s3-object-lambda:Get*
+              - s3-object-lambda:List*
+            Resource: "*"
+
+  Createiamuser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: Cactus
+      LoginProfile:
+        Password: Cactusinlove2022!
+        PasswordResetRequired: False
+      ManagedPolicyArns:
+        - !Ref Managedpolicy1
+
+```
+
 
 Lab 1.2.2: Exposing Resource Details via Exports
 Update the template by adding a CFN Output that exports the Managed Policy's Amazon Resource Name (ARN).
 
 Update the Stack.
 
+> Answer:
+```yaml
+Description: Creating an IAM user and assigned a managed policy
+Resources:
+ Managedpolicy1:
+  Type: 'AWS::IAM::ManagedPolicy'
+  Properties:
+   Description: Policy for creating for read action against all s3 buckets
+   PolicyDocument:
+    Version: '2012-10-17'
+    Statement:
+     - Effect: Allow
+       Action:
+        - s3:Get*
+        - s3:List*
+        - s3-object-lambda:Get*
+        - s3-object-lambda:List*
+       Resource: "*"
+
+ Createiamuser:
+  Type: AWS::IAM::User
+  Properties:
+   UserName: Cactus
+   LoginProfile:
+    Password: Cactusinlove2022!
+    PasswordResetRequired: False
+   ManagedPolicyArns:
+    - !Ref Managedpolicy1
+
+Outputs:
+ ManagedPolicyARN:
+  Description: Export of managed policy ARN
+  Value: !Ref Managedpolicy1
+  Export:
+   Name: ManagedPolicyA
+```
+
 List all the Stack Exports in that Stack's region.
+```aidl
+aws cloudformation list-exports
+```
 
 Lab 1.2.3: Importing another Stack's Exports
 Create a new CFN template that describes an IAM User and applies to it the Managed Policy ARN created by and exported from the previous Stack.
 
 Create this new Stack.
 
+> Answer: 
+```yaml
+Description: Creating an IAM user and assigned a managed policy
+Resources:
+  Createiamuser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: Cactus2
+      LoginProfile:
+        Password: Cactusinlove2022!
+        PasswordResetRequired: False
+      ManagedPolicyArns:
+        - Fn::ImportValue: ManagedPolicyA
+- 
+```
+
 List all the Stack Imports in that stack's region.
+```
+ aws cloudformation list-imports \
+     --export-name ManagedPolicyA
+
+```
 
 Lab 1.2.4: Import/Export Dependencies
 Delete your CFN stacks in the same order you created them in. Did you succeed? If not, describe how you would identify the problem, and resolve it yourself.
+
+``` You cannot delete in the same order since they are interconnected by export, remove in descending order```
 
 Retrospective 1.2
 Task: Policy Tester

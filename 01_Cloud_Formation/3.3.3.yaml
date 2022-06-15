@@ -1,0 +1,59 @@
+Parameters:
+  RoleName:
+    Description: Enter the role name in iamParameter.json file
+    Type: String
+  Bucket1Name:
+    Type: String
+    Default: assignment331
+  PolicyName1:
+    Type : String
+    Default: a331policy
+
+Resources:
+  Customermanagedpolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Ref PolicyName1
+      Description: Customer managed policy that gives full access to S3
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:Get*
+              - s3:List*
+            Resource: !GetAtt Bucket2.Arn
+          - Effect: Allow
+            Action:
+              - s3:*
+            Resource: !GetAtt Bucket1.Arn
+            Condition:
+              StringLike:
+                s3:prefix: lebowski/
+  AssumeRoleForIAMUser:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::744451519362:user/mr2chowd
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref Customermanagedpolicy
+
+  Bucket1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref Bucket1Name
+
+  Bucket2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join
+        - '-'
+        - - !Ref AWS::AccountId
+          - !Ref Bucket1Name

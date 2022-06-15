@@ -1,0 +1,13 @@
+Description: Creating an IAM user and assigned a managed policy
+Resources:
+  Createiamuser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: '{{resolve:secretsmanager:mysecrets:SecretString:username}}'
+      LoginProfile:
+        Password: Cactusinlove2022!
+        PasswordResetRequired: False
+  BucketS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: '{{resolve:secretsmanager:mysecrets:SecretString:bucketname}}'

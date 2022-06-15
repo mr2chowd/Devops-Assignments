@@ -1,5 +1,15 @@
-{
-  "Parameters": {
-    "BucketName": "myawesometestdemo"
+[
+  {
+    "ParameterKey" : "BucketName",
+    "ParameterValue" : "saifulcactus2122"
+  },
+  {
+    "ParameterKey" : "MyPreferredRegion",
+    "ParameterValue" : "us-east-1"
+  },
+  {
+    "ParameterKey" : "RoleName",
+    "ParameterValue" : "assignmentrole"
   }
-}
+
+]

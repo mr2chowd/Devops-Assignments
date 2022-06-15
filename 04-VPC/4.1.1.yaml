@@ -1,0 +1,53 @@
+Description:  This template deploys a VPC, with a pair of public and private subnets spread
+  across two Availability Zones. It deploys an internet gateway, with a default
+  route on the public subnets. It deploys a pair of NAT gateways (one in each AZ),
+  and default routes for them in the private subnets.
+
+Parameters:
+  EnvironmentName:
+    Description: Assignment 4 VPC
+    Type: String
+    Default: Assignment-4
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+
+Resources:
+  VPC1:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      Tags:
+        - Key: User
+          Value: mr2chowd
+        - Key: project
+          Value: VPC-4
+        - Key: lab
+          Value: 4.1.1
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC1
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      Tags:
+        - Key: User
+          Value: mr2chowd
+        - Key: project
+          Value: VPC-4
+        - Key: lab
+          Value: 4.1.1
+
+
+
+
+
+
+
+
+

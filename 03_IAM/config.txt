@@ -1,0 +1,12 @@
+{
+    "Credentials": {
+        "AccessKeyId": "ASIA22VGEWOBKY42SQRS",
+        "SecretAccessKey": "IphKa8upCYp8Y6KUdBNAfxan/pvVMssjI1pniRf8",
+        "SessionToken": "IQoJb3JpZ2luX2VjEIf//////////wEaCXVzLWVhc3QtMSJGMEQCIFz9JmXS2lyNm8EBNaFaG/Hb7Wlv6H/Q0rn6TbphQnUcAiBwQIXs7DU/jKkI4cVinKlRnk/WNs16hBr3d3hCBEqNxCqhAgiQ//////////8BEAAaDDc0NDQ1MTUxOTM2MiIMJp5jSbcmAdn4bB1BKvUBnp5MWwyVEVz2UHmgvzns8LPTUiw0+C5R5mZMrIQRG4y/pp4tzys6mniFIYP2wWpWNIq+ZH15p4wrbUcKDRZTZooTPGDsApqwNR1jTngQKHUR5vXQ67YXLzGLx6NrcVIwBnsUAF9MHutShlZ4Ui7RUcwM0PSSk+YwKQ5pSRz9Y3rqz8QjlbjdvCA/jbIc8boTmPksB6rk7N/szI3yi/3ONlLiZZ+4CqubjXiISb6ymXiZOE8VKbrHmebM9E5AJhVjGNSdnjcqezNWhlaXResHZX0zmcyprA3GFJvofN60MLFITTBrxS/qiS1rCkRvSS2kNDInOHMw7rSilQY6ngHIwPHbLvtF2LbXgnRYcv5sIdFZfrSLBg3sZiHD70a3EWhgvNnJsKYbK417SDVRz8eWeIW8zRftaxNnTylExllAYsbcfxdB4seVna98QmjWV3Q2SI+rN6P6NG+vJdGZq1N8t9Kc4KR0rIac4r8udUuICAbni/wHbb0Cesp3pOYJTkzIpnqsC9PSs3ioZV+a93MXb2lali/ACbLD5xgGag==",
+        "Expiration": "2022-06-14T15:25:50+00:00"
+    },
+    "AssumedRoleUser": {
+        "AssumedRoleId": "AROA22VGEWOBFDZJBHNK7:cactustoday",
+        "Arn": "arn:aws:sts::744451519362:assumed-role/RoleToAccessS3demo/cactustoday"
+    }
+}

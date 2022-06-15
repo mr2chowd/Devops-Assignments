@@ -1,0 +1,33 @@
+Description: Creating an IAM user and assigned a managed policy
+Resources:
+  Managedpolicy1:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for creating for read action against all s3 buckets
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:Get*
+              - s3:List*
+              - s3-object-lambda:Get*
+              - s3-object-lambda:List*
+            Resource: "*"
+
+  Createiamuser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: Cactus
+      LoginProfile:
+        Password: Cactusinlove2022!
+        PasswordResetRequired: False
+      ManagedPolicyArns:
+        - !Ref Managedpolicy1
+
+Outputs:
+  ManagedPolicyARN:
+    Description: Export of managed policy ARN
+    Value: !Ref Managedpolicy1
+    Export:
+      Name: ManagedPolicyA
