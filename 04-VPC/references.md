@@ -10,9 +10,14 @@ aws ec2 create-key-pair \
 
 
 chmod 400 fouronekey.pem
+
+
 Links:
 https://docs.aws.amazon.com/cli/latest/reference/cloudformation/create-stack.html
 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html
 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html
 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-internetgateway.html
 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-routetable.html
+
+**IMPORTANT LINK:**
+https://aws.amazon.com/blogs/compute/query-for-the-latest-amazon-linux-ami-ids-using-aws-systems-manager-parameter-store/

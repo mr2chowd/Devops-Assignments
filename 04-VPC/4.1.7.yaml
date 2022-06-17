@@ -17,6 +17,10 @@ Parameters:
     Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
     Type: String
 
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+
 Resources:
   VPC1:
     Type: AWS::EC2::VPC
@@ -38,6 +42,16 @@ Resources:
       Tags:
         - Key: Name
           Value: PublicSubnet1
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC1
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet1
+
   InternetGateway1:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -72,6 +86,35 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !GetAtt InternetGateway1.InternetGatewayId
 
+  NatGatewayEIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: !Ref VPC1
+
+  NateGateWay1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      AllocationId: !GetAtt NatGatewayEIP1.AllocationId
+
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC1
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet1
+
+  DefaultPrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NateGateWay1
+
 Outputs:
   VPCID:
     Description: A reference to the created VPC ID
@@ -84,6 +127,15 @@ Outputs:
     Value: !Ref PublicSubnet1
     Export:
       Name: four-publicsubnetid
+
+  PrivateSubnet1:
+    Description: A reference to the PRIVATE subnet in the 1st Availability Zone
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: four-privatesubnetid
+
+
+
 
 
 

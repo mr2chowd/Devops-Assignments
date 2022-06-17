@@ -1,0 +1,53 @@
+Description:  Creates an EC2 instance with the output from 4.1.3 subnet and VPC
+
+Parameters:
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+
+  Instancetype:
+    Description: Free Instance type for EC2
+    Type: String
+
+Resources:
+  EC2Server:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey
+      SubnetId: !ImportValue four-publicsubnetid
+      ImageId: !Ref LatestAmiId
+      InstanceType:  !Ref Instancetype
+      Tags:
+        - Key: User
+          Value: mr2chowd
+        - Key: project
+          Value: VPC-4
+        - Key: lab
+          Value: 4.1.1
+  SecurityGroup1:
+    Type: AWS::EC2::SecurityGroup
+    Description: Public Server Security Group
+    Properties:
+      GroupDescription: Allow ICMP and Tcp
+      VpcId: !ImportValue four-vpc-id
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.192.0.0/24
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+Outputs:
+  EC2ServerIDOutput:
+    Description: A reference to the created EC2 INSTANCE ID
+    Value: !Ref EC2Server
+    Export:
+      Name: Ec2ServerId
+  PublicIpOutput:
+    Description: Server Public IP
+    Value: !GetAtt EC2Server.PrivateIp
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicIp"
+
+

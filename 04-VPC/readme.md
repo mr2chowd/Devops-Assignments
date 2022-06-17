@@ -109,9 +109,14 @@ Use the same tags you put on your VPC.
 Question: Post Launch
 After you launch your new stack, can you ssh to the instance?
 
+No you cannot , since there is no public ip
+
 Question: Verify Connectivity
 Is there a way that you can verify Internet connectivity from the instance without ssh'ing to it?
-
+>Anwer: 
+```
+You can ping it
+```
 Lab 4.1.5: Security Group
 Add a security group to your EC2 stack:
 
@@ -119,6 +124,11 @@ Allow ICMP (for ping) and ssh traffic into your instance.
 Question: Connectivity
 Can you ssh to your instance yet?
 
+>Answer
+
+```
+No you cannot, since there is yet no public IP
+```
 Lab 4.1.6: Elastic IP
 Add an Elastic IP to your EC2 stack:
 
@@ -130,9 +140,19 @@ Your EC2 was already on a network with an IGW, and now we've fully exposed it to
 
 Question: Ping
 Can you ping your instance now?
+>Answer: 
+```
+yes
+```
+
 
 Question: SSH
 Can you ssh into your instance now?
+>Answer: 
+
+```
+yes you can 
+```
 
 Question: Traffic
 If you can ssh, can you send any traffic (e.g. curl) out to the Internet?
