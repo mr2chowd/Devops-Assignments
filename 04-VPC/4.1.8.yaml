@@ -1,0 +1,257 @@
+Description:  This template deploys a VPC, with a pair of public and private subnets spread
+  across two Availability Zones. It deploys an internet gateway, with a default
+  route on the public subnets. It deploys a pair of NAT gateways (one in each AZ),
+  and default routes for them in the private subnets.
+
+Parameters:
+  EnvironmentName:
+    Description: Assignment 4 VPC
+    Type: String
+    Default: Assignment-4
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+
+Resources:
+  VPC1:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      Tags:
+        - Key: User
+          Value: mr2chowd
+        - Key: project
+          Value: VPC-4
+        - Key: lab
+          Value: 4.1.1
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC1
+      CidrBlock: !Ref PublicSubnet1CIDR
+      Tags:
+        - Key: Name
+          Value: PublicSubnet1
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC1
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      Tags:
+        - Key: Name
+          Value: PrivateSubnet1
+
+  InternetGateway1:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: User
+          Value: mr2chowd
+        - Key: project
+          Value: VPC-4
+        - Key: lab
+          Value: 4.1.2
+  InternetGatewayVPCAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC1
+      InternetGatewayId: !GetAtt InternetGateway1.InternetGatewayId
+
+  RouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC1
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      SubnetId: !Ref PublicSubnet1
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !GetAtt InternetGateway1.InternetGatewayId
+
+  NatGatewayEIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: !Ref VPC1
+
+  NateGateWay1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      AllocationId: !GetAtt NatGatewayEIP1.AllocationId
+
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC1
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet1
+
+  DefaultPrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NateGateWay1
+
+  PublicNetworkAcl:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId:
+        Ref: VPC1
+
+  PublicNACLAssociation:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNetworkAcl
+      SubnetId: !Ref PublicSubnet1
+  PublicNACLInboundSSH:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 100
+      RuleAction: allow
+      CidrBlock: 184.146.8.52/32
+      NetworkAclId: !Ref PublicNetworkAcl
+      Protocol: 6
+      Egress: false
+      PortRange:
+        From: 22
+        To: 22
+  PublicNACLInboundAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 200
+      RuleAction: allow
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PublicNetworkAcl
+      Protocol: -1
+      Egress: False
+
+  PublicNACLOutboundboundAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 100
+      RuleAction: allow
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PublicNetworkAcl
+      Protocol: -1
+      Egress: True
+
+  PrivateNetworkAcl:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref VPC1
+
+  PrivateNACLAssociation:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PrivateNetworkAcl
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateNACLInboundSSH:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 100
+      RuleAction: allow
+      CidrBlock: !Ref PublicSubnet1CIDR
+      NetworkAclId: !Ref PrivateNetworkAcl
+      Protocol: 6
+      Egress: false
+      PortRange:
+        From: 22
+        To: 22
+  PrivateNACLOutboundboundSSH:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 110
+      RuleAction: Allow
+      CidrBlock: !Ref PublicSubnet1CIDR
+      NetworkAclId: !Ref PrivateNetworkAcl
+      Protocol: 6
+      Egress: True
+      PortRange:
+        From: 1024
+        To: 65535
+
+  PrivateNACLInboundICMP:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 200
+      RuleAction: Allow
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PrivateNetworkAcl
+      Protocol: 1
+      Egress: False
+      Icmp:
+        Code: "-1"
+        Type: "-1"
+  PrivateNACLOutboundICMP:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 210
+      RuleAction: Allow
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !Ref PrivateNetworkAcl
+      Protocol: 1
+      Egress: True
+      Icmp:
+        Code: "-1"
+        Type: "-1"
+
+Outputs:
+  VPCID:
+    Description: A reference to the created VPC ID
+    Value: !Ref VPC1
+    Export:
+      Name: four-vpc-id
+
+  PublicSubnetId1:
+    Description: Reference to the public subnet id
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: four-publicsubnetid
+
+  PrivateSubnet1:
+    Description: A reference to the PRIVATE subnet in the 1st Availability Zone
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: four-privatesubnetid
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

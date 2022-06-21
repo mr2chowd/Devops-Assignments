@@ -1,0 +1,144 @@
+Description:  Another Vpc2 for testing VPC peering connections
+
+Parameters:
+  EnvironmentName:
+    Description: Assignment 4.2 VPC Peering
+    Type: String
+    Default: Assignment-4 part 2 Peering
+
+  VpcPeerCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+
+  PublicSubnet1CIDRPeer:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+
+  PrivateSubnet1CIDRPeer:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+
+  VpcCIDR:
+    Description: To import the CIDR block of first VPC
+    Type: String
+
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+
+  Instancetype:
+    Description: Free Instance type for EC2
+    Type: String
+Resources:
+  VPCPeer:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcPeerCIDR
+      Tags:
+        - Key: User
+          Value: Peer1
+        - Key: project
+          Value: VPC-4
+        - Key: lab
+          Value: 4.2.1
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPCPeer
+      CidrBlock: !Ref PublicSubnet1CIDRPeer
+      Tags:
+        - Key: Name
+          Value: PublicSubnet1CIDRPeer
+
+  PublicNetworkAcl:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId:
+        Ref: VPCPeer
+
+  PublicNACLAssociation:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref PublicNetworkAcl
+      SubnetId: !Ref PublicSubnet1
+
+  PublicNACLInboundAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 100
+      RuleAction: allow
+      CidrBlock: !Ref VpcCIDR
+      NetworkAclId: !GetAtt PublicNetworkAcl.Id
+      Protocol: -1
+      Egress: False
+
+  PublicNACLOutboundboundAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      RuleNumber: 100
+      RuleAction: allow
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId: !GetAtt PublicNetworkAcl.Id
+      Protocol: -1
+      Egress: True
+
+  EC2PeerServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      SubnetId: !Ref PublicSubnet1
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref Instancetype
+      SecurityGroupIds:
+        - Ref: SecurityGroupPrivate
+      Tags:
+        - Key: "Name"
+          Value: "EC2PeerServer"
+
+
+  SecurityGroupPrivate:
+    Type: AWS::EC2::SecurityGroup
+    Description: Private Server Security Group
+    Properties:
+      GroupDescription: Allow ICMP and Tcp
+      VpcId: !Ref VPCPeer
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  VPCID:
+    Description: A reference to the created VPC ID
+    Value: !Ref VPCPeer
+    Export:
+      Name: VPCPeerid1
+
+  PublicSubnetId1:
+    Description: Reference to the public subnet id
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: peerpublicsubnetid
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

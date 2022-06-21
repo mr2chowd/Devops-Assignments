@@ -1,0 +1,34 @@
+Resources:
+  VpcPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      VpcId:
+        Fn::ImportValue: VPCPeerid1
+      PeerVpcId: !ImportValue four-vpc-id
+      PeerRegion: us-east-1
+
+  PeerGatewayRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !ImportValue RouteTable1id
+      DestinationCidrBlock: 11.192.0.0/16
+      VpcPeeringConnectionId: !Ref VpcPeeringConnection
+
+  RouteTableForPeering1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !ImportValue VPCPeerid1
+
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTableForPeering1
+      SubnetId: !ImportValue peerpublicsubnetid
+
+  RoutetoVPC1:
+    Type: AWS::EC2::Route
+    Properties:
+      VpcPeeringConnectionId: !Ref VpcPeeringConnection
+      DestinationCidrBlock: 10.192.0.0/16
+      RouteTableId: !Ref RouteTableForPeering1

@@ -16,7 +16,7 @@
         ssh-add -K cactus.pem
         ssh -a ec2-user@address    :::  ssh -a ec2-user@ec2-3-95-79-167.compute-1.amazonaws.com
         ssh ec2-user@10.192.1.240privateip4addres
-        ping -c3 8.8.8.8
+        ping -c 3 8.8.8.8
 
 
 **Resources used for completing this stack:**

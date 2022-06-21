@@ -11,4 +11,5 @@
     "ParameterKey" : "PrivateSubnet1CIDR",
     "ParameterValue" : "10.192.1.0/24"
   }
+
 ]

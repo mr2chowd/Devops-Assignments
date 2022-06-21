@@ -11,19 +11,15 @@ Resources:
   EC2Server:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: fouronekey
+      KeyName: fouronekey2
       SubnetId: !ImportValue four-publicsubnetid
       ImageId: !Ref LatestAmiId
       InstanceType:  !Ref Instancetype
       SecurityGroupIds:
         - Ref: SecurityGroup1
       Tags:
-        - Key: User
-          Value: mr2chowd
-        - Key: project
-          Value: VPC-4
-        - Key: lab
-          Value: 4.1.1
+        - Key: "Name"
+          Value: "EC2PublicServer"
   SecurityGroup1:
     Type: AWS::EC2::SecurityGroup
     Description: Public Server Security Group
@@ -34,28 +30,36 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 184.146.8.52/24
+          CidrIp: 142.188.2.24/24
         - IpProtocol: icmp
           FromPort: 8
           ToPort: -1
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
           CidrIp: 0.0.0.0/0
   PublicServerElasticIp:
     Type: AWS::EC2::EIP
     Properties:
       InstanceId: !Ref EC2Server
       Tags:
-        - Key: Name
-          Value: PublicServerElasticIp
+        - Key: "Name"
+          Value: "PublicServerElasticIp"
 
   EC2PrivateServer:
     Type: AWS::EC2::Instance
     Properties:
-      KeyName: fouronekey
+      KeyName: fouronekey2
       SubnetId: !ImportValue four-privatesubnetid
       ImageId: !Ref LatestAmiId
       InstanceType: !Ref Instancetype
       SecurityGroupIds:
         - Ref: SecurityGroupPrivate
+      Tags:
+        - Key: "Name"
+          Value: "EC2PrivateServer"
+
 
   SecurityGroupPrivate:
     Type: AWS::EC2::SecurityGroup

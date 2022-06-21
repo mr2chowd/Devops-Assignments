@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey" : "VpcPeerCIDR",
+    "ParameterValue" : "11.192.0.0/16"
+  },
+  {
+    "ParameterKey" : "PublicSubnet1CIDRPeer",
+    "ParameterValue" : "11.192.0.0/24"
+  },
+  {
+    "ParameterKey" : "PrivateSubnet1CIDRPeer",
+    "ParameterValue" : "11.192.1.0/24"
+  },
+  {
+    "ParameterKey" : "PrivateSubnet1CIDRPeer",
+    "ParameterValue" : "11.192.1.0/24"
+  },
+  {
+    "ParameterKey" : "VpcCIDR",
+    "ParameterValue" : "10.192.0.0/16"
+  },
+  {
+    "ParameterKey" : "Instancetype",
+    "ParameterValue" : "t2.micro"
+  },
+  {
+    "ParameterKey" : "LatestAmiId",
+    "ParameterValue" : "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+  }
+]

@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create EC2 to launch template resources
+Resources:
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        KeyName: fouronekey2.pem
+
+  WindowsInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-03e42a81d67097502
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: WindowsInstance
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+
