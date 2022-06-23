@@ -226,8 +226,24 @@ function.
 
 - Using the AWS CLI, retrieve the Stack's outputs to fetch the EIP's
   IPV4 address.
+>Answer: 
 
+```text
+aws cloudformation list-exports
+
+or, 
+to check specific stacks
+
+aws cloudformation describe-stacks --stack-name ec2test
+
+
+
+```
 Try pinging that IP address. Does it work?
+
+```text
+Wont work since, Security group is not defined for my ip
+```
 
 - Using the CFN template, create a Security Group enabling
   [ICMP](https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol).
@@ -238,6 +254,11 @@ Try pinging that IP address. Does it work?
 
 Can you ping your instance now? If not, troubleshoot and fix the issue
 using your CFN template.
+```text
+
+Yes,ping works now
+
+```
 
 #### Lab 5.2.2: SSH Keys
 

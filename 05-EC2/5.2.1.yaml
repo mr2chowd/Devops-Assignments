@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: CFN template to create EC2 to launch template resources
+
 Resources:
   MyLaunchTemplate1:
     Type: "AWS::EC2::LaunchTemplate"
@@ -7,7 +8,8 @@ Resources:
       LaunchTemplateName: MyLaunchTemplate
       LaunchTemplateData:
         InstanceType: t2.micro
-        KeyName: fouronekey2.pem
+        SecurityGroupIds:
+          - !GetAtt SecurityGroupUbuntu.GroupId
 
   ElasticIpforUbuntu:
     Type: AWS::EC2::EIP
@@ -25,6 +27,20 @@ Resources:
       Tags:
         - Key: Name
           Value: UbuntuInstance
+
+  SecurityGroupUbuntu:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG to enable SSH and ICMP For Ubuntu
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 142.188.2.24/32
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
 
 Outputs:
   EIPIPV4:

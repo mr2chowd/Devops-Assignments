@@ -7,7 +7,6 @@ Resources:
       LaunchTemplateName: MyLaunchTemplate
       LaunchTemplateData:
         InstanceType: t2.micro
-        KeyName: fouronekey2.pem
 
   WindowsInstance1:
     Type: AWS::EC2::Instance
