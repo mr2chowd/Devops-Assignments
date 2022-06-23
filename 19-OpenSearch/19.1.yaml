@@ -1,7 +1,57 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description:
+Description: Tempalte to create an open search service
+Parameters:
+  MasterInstanceType:
+    Description: Please choose the type of instance you want such as m3.medium.search or something in the json parameter file
+    Type: String
+  DataNodeInstanceType:
+    Description: Data node instance type
+    Type: String
+  WarmInstanceType:
+    Description: The instance type for the cluster's warm nodes.
+    Type: String
+  EBSVolumeSize:
+    Description: EBS Volume Size
+    Type: String
+  EBSVolumeType:
+    Description: EBS Volume Size
+    Type: String
 Resources:
-  DummyServer:
-    Type: "AWS::EC2::Instance"
+  Domain1:
+    Type: AWS::OpenSearchService::Domain
     Properties:
-      ImageId: ""
+      DomainName: test
+      AdvancedSecurityOptions:
+        Enabled: True
+        MasterUserOptions:
+          MasterUserName: {{resolve:secretsmanager:OpenSearchUSER:SecretString:UserName}}
+          MasterUserPassword: {{resolve:secretsmanager:OpenSearchUSER:SecretString:Password}}
+      ClusterConfig:
+        DedicatedMasterCount: 3
+        DedicatedMasterEnabled: True
+        DedicatedMasterType: !Ref MasterInstanceType
+        InstanceCount: 3
+        InstanceType: !Ref DataNodeInstanceType
+        WarmEnabled: True
+        WarmCount: 2
+        WarmType: !Ref WarmInstanceType
+      DomainEndpointOptions:
+        EnforceHTTPS: True
+      NodetoNodeEncryptionOptions:
+        Enabled: True
+      EncryptionAtRestOptions:
+        Enabled: True
+      EBSOptions:
+        EBSEnabled: True
+        VolumeSize: !Ref EBSVolumeSize
+        VolumeType: !Ref EBSVolumeType
+      Tags:
+        - Key: Name
+          Value: OpenSearchProject
+Outputs:
+  Description: Output of the domain endpoint
+  Value: !GetAtt Domain1.DomainEndpoint
+  Export:
+    Name: opensearchdomainendpoint
+
+
