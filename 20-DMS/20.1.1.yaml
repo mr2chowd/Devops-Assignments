@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Cloud-Formation Data Migration Service Template
+Parameters:
+  EngineVersion:
+    Type: String
+    Default: 13.6
+    AllowedValues:
+      - 13.3
+      - 13.4
+      - 13.5
+      - 13.6
+      - 13.7
+Resources:
+  RDSCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-postgresql
+      DatabaseName: database1
+      DBClusterIdentifier: cluster1
+      EngineVersion: !Ref EngineVersion
+      MasterUsername: '{{resolve:secretsmanager:RDS/Aurora/Test/Credentials:SecretString:Username}}'
+      MasterUserPassword: '{{resolve:secretsmanager:RDS/Aurora/Test/Credentials:SecretString:Password}}'
+
+  RDSInstance1:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref RDSCluster
+      DBInstanceClass: db.t4g.medium
+      DBInstanceIdentifier: RDSInstance1
+      Engine: aurora-postgresql
+      PubliclyAccessible: True
+
+
+
+
+
