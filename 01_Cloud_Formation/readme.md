@@ -1,3 +1,44 @@
+# Topic 1: CloudFormation
+
+<!-- TOC -->
+
+- [Topic 1: CloudFormation](#topic-1-cloudformation)
+ - [Conventions](#conventions)
+ - [Lesson 1.1: Introduction to CloudFormation](#lesson-11-introduction-to-cloudformation)
+  - [Principle 1.1](#principle-11)
+  - [Practice 1.1](#practice-11)
+   - [Lab 1.1.1: CloudFormation Template Requirements](#lab-111-cloudformation-template-requirements)
+   - [Lab 1.1.2: Stack Parameters](#lab-112-stack-parameters)
+   - [Lab 1.1.3: Pseudo-Parameters](#lab-113-pseudo-parameters)
+   - [Lab 1.1.4: Using Conditions](#lab-114-using-conditions)
+   - [Lab 1.1.5: Termination Protection; Clean up](#lab-115-termination-protection-clean-up)
+  - [Retrospective 1.1](#retrospective-11)
+   - [Question: Why YAML](#question-why-yaml)
+   - [Question: Protecting Resources](#question-protecting-resources)
+   - [Task: String Substitution](#task-string-substitution)
+ - [Lesson 1.2: Integration with Other AWS Resources](#lesson-12-integration-with-other-aws-resources)
+  - [Principle 1.2](#principle-12)
+  - [Practice 1.2](#practice-12)
+   - [Lab 1.2.1: Cross-Referencing Resources within a Template](#lab-121-cross-referencing-resources-within-a-template)
+   - [Lab 1.2.2: Exposing Resource Details via Exports](#lab-122-exposing-resource-details-via-exports)
+   - [Lab 1.2.3: Importing another Stack's Exports](#lab-123-importing-another-stacks-exports)
+   - [Lab 1.2.4: Import/Export Dependencies](#lab-124-importexport-dependencies)
+  - [Retrospective 1.2](#retrospective-12)
+   - [Task: Policy Tester](#task-policy-tester)
+   - [Task: SSM Parameter Store](#task-ssm-parameter-store)
+ - [Lesson 1.3: Portability & Staying DRY](#lesson-13-portability--staying-dry)
+  - [Principle 1.3](#principle-13)
+  - [Practice 1.3](#practice-13)
+   - [Lab 1.3.1: Scripts and Configuration](#lab-131-scripts-and-configuration)
+   - [Lab 1.3.2: Coding with AWS SDKs](#lab-132-coding-with-aws-sdks)
+   - [Lab 1.3.3: Enhancing the Code](#lab-133-enhancing-the-code)
+  - [Retrospective 1.3](#retrospective-13)
+   - [Question: Portability](#question-portability)
+   - [Task: DRYer Code](#task-dryer-code)
+ - [Additional Reading](#additional-reading)
+
+<!-- /TOC -->
+
 Lesson 1.1: Introduction to CloudFormation
 Principle 1.1
 AWS CloudFormation (CFN) is the preferred way we create AWS resources
@@ -9,19 +50,22 @@ Read through Template Anatomy and get familiar with the basic parts of a CloudFo
 
 Lab 1.1.1: CloudFormation Template Requirements
 Create the most minimal CFN template possible that can be used to create an AWS Simple Storage Service (S3) Bucket.
-
-Always write your CloudFormation templates in YAML.
 > Answer:
 ```yaml
 Description: Creating an S3 bucket with minimal inputs
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
-
+    Properties:
+     BucketName: mochowdhury2022
 ```
 
 Launch a Stack by using the AWS CLI tool to run the template. Use your preferred region.
 
+> Ans:
+```
+aws cloudformation create-stack --stack-name nameofstack --template-body file://somestack.yaml
+```
 Note the output provided by creating the Stack.
 
 Though functionally unnecessary, the Description (i.e. its purpose) element documents your code's intent, so provide one. The Description key-value pair should be at the root level of your template. If you place it under the definition of a resource, AWS will allow the template's creation but your description will not populate anything. See here for a useful guide to the anatomy of a template as well as YAML terminology.
@@ -30,12 +74,39 @@ Commit the template to your Github repository under the 01-cloudformation folder
 
 Lab 1.1.2: Stack Parameters
 Update the same template by adding a CloudFormation Parameter to the stack and use the parameter's value as the name of the S3 bucket.
+> Ans:
+```yaml
+Parameters:
+BucketName:
+Type: String
+Description: Bucket name
+
+Description: Creating an S3 bucket with minimal inputs
+Resources:
+S3Bucket:
+Type: AWS::S3::Bucket
+Properties:
+BucketName: !Ref BucketName
+```
 
 Put your parameter into a separate JSON file and pass that file to the CLI.
 
 Update your stack.
 
-Add the template changes and new parameter file to your Github repo.
+> Ans:
+```json
+[
+  {
+    "ParameterKey" : "BucketName",
+    "ParameterValue" : "Chowdhurymo2323"
+  }
+]
+```
+
+> Ans:
+```
+$ aws cloudformation update-stack --stack-name BucketCreation --template-body file://1.2.yaml --parameters file://test.json
+```
 
 Lab 1.1.3: Pseudo-Parameters
 Update the same template by prefixing the name of the bucket with the Account ID in which it is being created, no matter which account you're running the template from (i.e., using pseudo-parameters).
@@ -43,10 +114,25 @@ Update the same template by prefixing the name of the bucket with the Account ID
 Use built-in CFN string functions to combine the two strings for the Bucket name.
 
 Do not hard code the Account ID. Do not use an additional parameter to provide the Account ID value.
+> Ans:
+```yaml
+Parameters:
+  BucketName:
+    Type: String
+    Description: Bucket name
 
-Update the stack.
+Description: Creating an S3 bucket with minimal inputs
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub
+                  - '${AWS::AccountId}-${s3bucket}'
+                  - s3bucket: !Ref BucketName
 
-Commit the changes to your Github repo.
+```
+
+
 
 Lab 1.1.4: Using Conditions
 Update the same template one final time. This time, use a CloudFormation Condition to add a prefix to the name of the bucket. When the current execution region is your preferred region, prefix the bucket name with the Account ID. When executing in all other regions, use the region name.
@@ -54,8 +140,6 @@ Update the same template one final time. This time, use a CloudFormation Conditi
 Update the stack that you originally deployed.
 
 Create a new stack with the same stack name, but this time deploying to some region other than your preferred region.
-
-Commit the changes to your Github repo.
 
 >Answer:
 
@@ -126,6 +210,13 @@ Retrospective 1.1
 Question: Why YAML
 Why do we prefer the YAML format for CFN templates?
 
+> Ans: YAML CloudFormation supports all the features and functions of JSON CloudFormation.Furthermore, it
+> incorporates additional features to reduce the length of code and enhances readability.
+>
+> YAML also supports comments using the # character.
+> Since CF templates can get long and complicated, inclusion of key comments in the code can 
+> make it easier to understand and benefit teams that share and collaborate in the same file
+>
 Question: Protecting Resources
 What else can you do to prevent resources in a stack from being deleted?
 
