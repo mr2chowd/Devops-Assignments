@@ -98,11 +98,11 @@ Resources:
                 "Id": "TASK_MANAGER",
                 "Severity": "LOGGER_SEVERITY_DEBUG"
               }],
-              "CloudWatchLogGroup": "RDSOSMetrics",
+              "CloudWatchLogGroup": "dms1",
               "CloudWatchLogStream": null
             }
         }
-        
+  
 
   SourceEndPointBucket1:
     Type: AWS::DMS::Endpoint
@@ -157,6 +157,8 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: dms-target-role
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -184,16 +186,16 @@ Resources:
                 Action:
                   - s3:*
                 Resource: '*'
-        - PolicyName: cloudwatchaccesspolicy
-            PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:*
-                  Resource: '*'
-
-
+#        - PolicyName: cloudwatchaccesspolicy
+#          PolicyDocument:
+#            Version: 2012-10-17
+#            Statement:
+#              - Effect: Allow
+#                Action:
+#                  - logs:'*'
+#                Resource: '*'
+#
+#
 
 
 

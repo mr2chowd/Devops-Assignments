@@ -1,31 +1,43 @@
-AWSTemplateFormatVersion: "2010-09-09"
+#AWSTemplateFormatVersion: "2010-09-09"
 Description: Tempalte to create an open search service
 Parameters:
   MasterInstanceType:
     Description: Please choose the type of instance you want such as m3.medium.search or something in the json parameter file
     Type: String
+    AllowedValues:
+      - c5.large.search
+      - r5.large.search
   DataNodeInstanceType:
     Description: Data node instance type
     Type: String
+    AllowedValues:
+      - c5.large.search
+      - r5.large.search
   WarmInstanceType:
     Description: The instance type for the cluster's warm nodes.
     Type: String
+    AllowedValues:
+      - ultrawarm1.medium.search
   EBSVolumeSize:
     Description: EBS Volume Size
     Type: String
   EBSVolumeType:
     Description: EBS Volume Size
     Type: String
+    AllowedValues:
+      - gp2
+      - gp3
 Resources:
-  Domain1:
+  OpenSearchCluster:
     Type: AWS::OpenSearchService::Domain
     Properties:
       DomainName: test
       AdvancedSecurityOptions:
         Enabled: True
+        InternalUserDatabaseEnabled: True
         MasterUserOptions:
-          MasterUserName: {{resolve:secretsmanager:OpenSearchUSER:SecretString:UserName}}
-          MasterUserPassword: {{resolve:secretsmanager:OpenSearchUSER:SecretString:Password}}
+          MasterUserName: '{{resolve:secretsmanager:OpenSearchuser:SecretString:UserName}}'
+          MasterUserPassword: '{{resolve:secretsmanager:OpenSearchuser:SecretString:Password}}'
       ClusterConfig:
         DedicatedMasterCount: 3
         DedicatedMasterEnabled: True
@@ -37,7 +49,7 @@ Resources:
         WarmType: !Ref WarmInstanceType
       DomainEndpointOptions:
         EnforceHTTPS: True
-      NodetoNodeEncryptionOptions:
+      NodeToNodeEncryptionOptions:
         Enabled: True
       EncryptionAtRestOptions:
         Enabled: True
@@ -49,9 +61,10 @@ Resources:
         - Key: Name
           Value: OpenSearchProject
 Outputs:
-  Description: Output of the domain endpoint
-  Value: !GetAtt Domain1.DomainEndpoint
-  Export:
-    Name: opensearchdomainendpoint
+  opensearchdomainendpoint1:
+    Description: Output of the domain endpoint
+    Value: !GetAtt OpenSearchCluster.DomainEndpoint
+    Export:
+      Name: opensearchdomainendpoint1
 
 

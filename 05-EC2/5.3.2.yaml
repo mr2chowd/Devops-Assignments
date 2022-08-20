@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create EC2 to launch template resources
+
+Resources:
+  RootInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        - Ref: "IAMRole"
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        IamInstanceProfile:
+          Arn: !GetAtt
+            - RootInstanceProfile
+            - Arn
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - !GetAtt SecurityGroupUbuntu.GroupId
+
+  ElasticIpforUbuntu:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref UbuntuInstance1
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip
+          sudo apt install unzip
+          unzip AmazonCloudWatchAgent.zip
+          sudo ./install.sh
+          sudo wget -O /opt/aws/amazon-cloudwatch-agent/bin/config.json https://mochowdhurycw.s3.amazonaws.com/amazon-cloudwatch-agent.json
+          sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
+          sudo echo testing > /opt/aws/amazon-cloudwatch-agent/logs/test.log
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+  SecurityGroupUbuntu:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG to enable SSH and ICMP For Ubuntu
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 142.188.2.24/32
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  EIPIPV4:
+    Description: Reference for the elastic ip address
+    Value: !Ref ElasticIpforUbuntu
+    Export:
+      Name: EIP-Output
+
+
+
+
+

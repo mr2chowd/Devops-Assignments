@@ -43,22 +43,6 @@
 
 <!-- /TOC -->
 
-## Conventions
-
-- Do NOT copy and paste CloudFormation templates from the Internet at
-  large
-
-- DO use the [CloudFormation documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-reference.html)
-
-- DO utilize every link in this document; note how the AWS
-  documentation is laid out
-
-- DO use the [AWS CLI for CloudFormation](https://docs.aws.amazon.com/cli/latest/reference/cloudformation/index.html#)
-  (NOT the Console) unless otherwise specified.
-
-- Only specify the minimum configuration required for your resources.
-  Don't get completely lost in all the options you can add.
-
 ## Lesson 5.1: Introduction to Elastic Compute Cloud
 
 ### Principle 5.1
@@ -93,13 +77,31 @@ Describe these instance attributes by querying the Cloud9 environment's
 - the image snapshot, or Amazon Machine Image (AMI), the instance was
   launched from
 
+
+> Ans: $ curl http://169.254.169.254/latest/meta-data/ami-id
+
 - the Type of instance created from that AMI
+
+> Ans: $ curl http://169.254.169.254/latest/meta-data/instance-type
 
 - the public IPV4 IP address
 
+> Ans: $ curl http://169.254.169.254/latest/meta-data/public-ipv4
+
 - the Security Groups the instance is associated with
+> Ans: $ curl http://169.254.169.254/latest/meta-data/security-groups
 
 - the networking Subnet ID the instance was launched into
+
+> Ans: $ curl http://169.254.169.254/latest/meta-data/network
+> <br>
+> $ curl http://169.254.169.254/latest/meta-data/network/interfaces
+> <br>
+> $ curl http://169.254.169.254/latest/meta-data/network/interfaces/macs
+> <br>
+> $ curl http://169.254.169.254/latest/meta-data/network/interfaces/macs/**:**:**:**:**:**
+> <br>
+> $ curl http://169.254.169.254/latest/meta-data/network/interfaces/macs/**:**:**:**:**:**/subnet-id
 
 Save your queries (but not the outputs) in your source code.
 
@@ -330,6 +332,14 @@ the [CloudWatch Agent on instances provides an extended set of metrics](https://
 
 - Use the AWS Console to fetch and record the default instance metrics.
 
+>Answer: 
+
+```
+aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization  --period 3600 \
+--statistics Maximum --dimensions Name=InstanceId,Value=i-06e3839a6408835f8 \
+--start-time 2022-06-28T15:10:00 --end-time 2022-06-28T15:27:00
+```
+
 #### Lab 5.3.2: Installing the CloudWatch Agent
 
 Let's [install the CloudWatch Agent](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html)
@@ -339,8 +349,22 @@ provisioning: instance profiles and userdata.
 allow the instance to assume a role and utilize that role's privileges
 to perform actions on AWS. [Userdata](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html)
 gives you the ability to run commands on the instance being launched. If
-you get stuck SSH into the machine and use the logs referenced in the
+you get stuck while performing SSH into the machine and use the logs referenced in the
 Userdata docs to debug.
+>Answer: 
+
+```
+
+#download it
+sudo curl -o /root/amazon-cloudwatch-agent.deb https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+#install it
+sudo dpkg -i -E /root/amazon-cloudwatch-agent.deb
+
+link for video: https://www.youtube.com/watch?v=ZCHwJLqPLj8&ab_channel=StephaneMaarek
+
+
+
+```
 
 - Modify your CFN template so that your Launch Template installs and
   starts the CloudWatch Agent on boot-up of your Ubuntu 16.04 LTS

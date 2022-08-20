@@ -1,6 +1,6 @@
 [
   {
-    "ParameterKey" : "Instancetype",
+    "ParameterKey" : "MasterInstanceType",
     "ParameterValue" : "t2.micro"
   },
   {

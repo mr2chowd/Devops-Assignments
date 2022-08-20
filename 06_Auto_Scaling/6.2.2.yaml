@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create Debian instance to launch template resources
+Resources:
+  AutoScalingLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: AutoScalingLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        KeyName: fouronekey2
+        ImageId: ami-09a41e26df464c548
+
+  ASGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - us-east-1a
+      LaunchTemplate:
+        LaunchTemplateId: !Ref AutoScalingLaunchTemplate1
+        Version: !GetAtt AutoScalingLaunchTemplate1.LatestVersionNumber
+      MaxSize: 2
+      MinSize: 1
+      DesiredCapacity: 2
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: True
+
+
+
+
+
+
