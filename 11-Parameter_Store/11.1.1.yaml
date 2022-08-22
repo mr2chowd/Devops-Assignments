@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+Resources:
+  DummyServer:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: String
+      AllowedPattern: String
+      DataType: String
+      Description: String
+      Policies: String
+      Tags: Json
+      Tier: String
+      Type: String
+      Value: String

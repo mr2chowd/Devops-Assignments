@@ -222,10 +222,57 @@ What else can you do to prevent resources in a stack from being deleted?
 
 See DeletionPolicy.
 
-How is that different from applying Termination Protection?
+> Ans: To prevent deletion or updates to resources in an AWS CloudFormation stack, we can:
+> 1. Set the DeletionPolicy attribute to prevent the deletion of an individual resource at the stack level.
+> 2. Use AWS Identity and Access Management (IAM) policies to restrict the ability of users to delete or update a stack and its resources.
+> 3. Assign a stack policy to prevent updates to stack resources.
+>
+> With the DeletionPolicy attribute you can preserve, and in some cases, backup a resource when its stack is deleted.
+> You specify a DeletionPolicy attribute for each resource that you want to control. If a resource has no
+> DeletionPolicy attribute, AWS CloudFormation deletes the resource by default.
+>
+> To keep a resource when its stack is deleted, specify Retain for that resource. You can use retain for any resource.
+> For example, you can retain a nested stack, Amazon S3 bucket, or EC2 instance so that you can continue to use or
+> modify those resources after you delete their stacks.
+
+_How is that different from applying Termination Protection?_
+
+> Ans: AWS CloudFormation allows you to protect a stack from being accidently deleted. You can enable termination
+> protection on a stack when you create it. If you attempt to delete a stack with termination protection enabled,
+> the deletion fails and the stack, including its status, will remain unchanged. To delete a stack you need to
+> first disable termination protection.
+>
+> Deletion policy applied to resource and termination protection applies to stack.
 
 Task: String Substitution
 Demonstrate 2 ways to code string combination/substitution using built-in CFN functions.
+>Ans: Two ways to code String combination:
+>
+> Option 1:
+> ```yaml
+> BucketName: !Join
+>        - ''
+>       - - !Ref AWS::AccountId
+>          - !Ref NameYourBucket
+>```
+> Option 2:
+> ```yaml
+> BucketName: !Join [ '', [!Ref AWS::AccountId, !Ref NameYourBucket]]
+>```
+>
+> Two ways to code String combination:
+>
+> Option 1:
+> ```yaml
+>Resource: !Sub "arn:aws:s3:::${ImageBucketName}/*"
+>```
+>
+> Option 2:
+> ```yaml
+>!Sub
+> - 'arn:aws:s3:::${ImageBucketName}/*'
+> - { ImageBucketName: Ref MyBucket }
+>```
 
 Lesson 1.2: Integration with Other AWS Resources
 Principle 1.2
@@ -247,7 +294,7 @@ Create the Stack.
 >Answer:
 ```yaml
 
-Description: Creating an IAM user and assigned a managed policy
+Description: Cross-Referencing Resources within a Template using IAM user and IAM Managed policy
 Resources:
   Managedpolicy1:
     Type: 'AWS::IAM::ManagedPolicy'
@@ -364,6 +411,38 @@ Show how to use the IAM policy tester to demonstrate that the user cannot perfor
 Task: SSM Parameter Store
 Using the AWS Console, create a Systems Manager Parameter Store parameter in the same region as the first Stack, and provide a value for that parameter. Modify the first Stack's template so that it utilizes this Parameter Store parameter value as the IAM User's name. Update the first stack. Finally, tear it down.
 
+```yaml
+Description: Cross-Referencing Resources within a Template using IAM user and IAM Managed policy
+
+Parameters:
+  UserName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: UserName
+    Description: Please Enter the username here
+
+Resources:
+  CreateIAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName
+      LoginProfile:
+        Password: MoChowdhury@1234
+        PasswordResetRequired: No
+
+  ManagedPolicyForIAM:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:Get*
+              - s3:List*
+            Resource: '*'
+      Users:
+        - !Ref CreateIAMUser
+```
 Lesson 1.3: Portability & Staying DRY
 Principle 1.3
 CloudFormation templates should be portable, supporting Don't Repeat Yourself (DRY) practices.

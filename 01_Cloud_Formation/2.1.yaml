@@ -1,4 +1,4 @@
-Description: Creating an IAM user and assigned a managed policy
+Description: Cross-Referencing Resources within a Template using IAM user and IAM Managed policy
 Parameters:
   BucketNameS3:
     Type: AWS::SSM::Parameter::Value<String>
