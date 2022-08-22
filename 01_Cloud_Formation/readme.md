@@ -316,7 +316,7 @@ Resources:
     Properties:
       UserName: Cactus
       LoginProfile:
-        Password: Cactusinlove2022!
+        Password: Cactus022!
         PasswordResetRequired: False
       ManagedPolicyArns:
         - !Ref Managedpolicy1
@@ -353,7 +353,7 @@ Resources:
   Properties:
    UserName: Cactus
    LoginProfile:
-    Password: Cactusinlove2022!
+    Password: Cactus022!
     PasswordResetRequired: False
    ManagedPolicyArns:
     - !Ref Managedpolicy1
@@ -385,7 +385,7 @@ Resources:
     Properties:
       UserName: Cactus2
       LoginProfile:
-        Password: Cactusinlove2022!
+        Password: Cactus2022!
         PasswordResetRequired: False
       ManagedPolicyArns:
         - Fn::ImportValue: ManagedPolicyA
