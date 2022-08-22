@@ -97,6 +97,39 @@ Group (ASG): [ask Amazon to create one for us from a running instance](https://d
 - Copy one of your templates from the EC2 lessons and modify it to
   launch a t2.micro Debian instance.
 
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create Debian instance to launch template resources
+Resources:
+  AutoScalingLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: AutoScalingLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        KeyName: fouronekey2
+
+  DebianInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-09a41e26df464c548
+      LaunchTemplate:
+        LaunchTemplateId: !Ref AutoScalingLaunchTemplate1
+        Version: !GetAtt AutoScalingLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: DebianInstance1
+
+Outputs:
+  InstanceId:
+    Description: Instance ID
+    Export:
+      Name: Output-Debian-Instance-Id
+    Value: !Ref DebianInstance1
+
+
+
+```
 - Launch the stack and get the instance ID.
 
 - Use the AWS CLI to create an Auto Scaling Group from that instance
@@ -109,6 +142,10 @@ aws autoscaling create-auto-scaling-group --auto-scaling-group-name asgroup --in
 
 ```
 - Limit the ASG to a single instance at all times.
+
+```yaml
+
+```
 
 ##### Question: Resources
 
@@ -146,6 +183,29 @@ Then update the stack.
 Your Launch Config will look a little different than the one Amazon
 created for you in Lab 6.1.1.
 
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create Debian instance to launch template resources
+Resources:
+  ASLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      #      InstanceId: !Ref DebianInstance1
+      ImageId: ami-09a41e26df464c548
+      InstanceType: t2.micro
+      KeyName: fouronekey2
+
+  ASGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - us-east-1a
+      AutoScalingGroupName: asg12
+      LaunchConfigurationName: !Ref ASLaunchConfig
+      MaxSize: 1
+      MinSize: 1
+
+```
 ##### Question: ASG From Existing Instance
 
 _What config info or resources did you have to create explicitly that Amazon
@@ -160,14 +220,36 @@ I needed to input the intance id and min and max sizes of instances for ASG
 
 Modify your launch config by increasing your instances from t2.micro to
 t2.small. Update your stack.
+```yaml
 
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create Debian instance to launch template resources
+Resources:
+  ASLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      #      InstanceId: !Ref DebianInstance1
+      ImageId: ami-09a41e26df464c548
+      InstanceType: t2.small
+      KeyName: fouronekey2
+
+  ASGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - us-east-1a
+      AutoScalingGroupName: asg12
+      LaunchConfigurationName: !Ref ASLaunchConfig
+      MaxSize: 1
+      MinSize: 1
+```
 ##### Question: Stack Updates
 
 _After updating your stack, did your running instance get replaced or resized?_
 
 >Answer:
 ```text
-Nothing hapenned, only launch config got changed
+Nothing happened, only launch config got changed
 ```
 Terminate the instance in your ASG.
 >Answer:
@@ -191,6 +273,32 @@ in your ASGs template so that the instance will be replaced on change,
 then modify your launch config again, this time changing your instance
 type to t2.medium. Update your stack.
 
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create Debian instance to launch template resources
+Resources:
+  ASLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      #      InstanceId: !Ref DebianInstance1
+      ImageId: ami-09a41e26df464c548
+      InstanceType: t2.micro
+      KeyName: fouronekey2
+
+  ASGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - us-east-1a
+      AutoScalingGroupName: asg
+      LaunchConfigurationName: !Ref ASLaunchConfig
+      MaxSize: 1
+      MinSize: 1
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: True
+
+```
 ##### Question: Instance Updating
 
 _After updating, what did you see change? Did your running instance get
@@ -214,7 +322,33 @@ Finally, replace your launch config with a [Launch Template](https://docs.aws.am
 then update your stack again. Specify only the minimum number of
 parameters you need to.
 
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create Debian instance to launch template resources
+Resources:
+  AutoScalingLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: AutoScalingLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        KeyName: fouronekey2
+        ImageId: ami-09a41e26df464c548
 
+  ASGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - us-east-1a
+      LaunchTemplate:
+        LaunchTemplateId: !Ref AutoScalingLaunchTemplate1
+        Version: !GetAtt AutoScalingLaunchTemplate1.LatestVersionNumber
+      MaxSize: 1
+      MinSize: 1
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: True
+```
 ##### Question: Required Info
 
 _What config info or resources do you have to provide in addition to what
@@ -222,7 +356,7 @@ Launch Configurations require?_
 
 >Answer:
 ```text
-
+Ans: There was no difference.
 ```
 You'll see both launch configs and launch templates in your client
 engagements. Templates were [introduced in Nov 2017](https://aws.amazon.com/about-aws/whats-new/2017/11/introducing-launch-templates-for-amazon-ec2-instances/)
@@ -337,6 +471,35 @@ Watch your stack and your ASG in the web console as you do this lab.
 
 Modify your stack template to increase the desired number of instances,
 then update the stack.
+
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create Debian instance to launch template resources
+Resources:
+  AutoScalingLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: AutoScalingLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        KeyName: fouronekey2
+        ImageId: ami-09a41e26df464c548
+
+  ASGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        - us-east-1a
+      LaunchTemplate:
+        LaunchTemplateId: !Ref AutoScalingLaunchTemplate1
+        Version: !GetAtt AutoScalingLaunchTemplate1.LatestVersionNumber
+      MaxSize: 2
+      MinSize: 1
+      DesiredCapacity: 2
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: True
+```
 
 ##### Question: Desired Count
 

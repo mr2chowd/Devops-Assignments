@@ -1,248 +1,501 @@
-Topic 3: Identity and Access Management (IAM)
-Topic 3: Identity and Access Management (IAM)
-Conventions
-Lesson 3.1: Introduction to Identity and Access Management
-Principle 3.1
-Practice 3.1
-Lab 3.1.1: IAM Role
-Lab 3.1.2: Customer Managed Policy
-Lab 3.1.3: Customer Managed Policy Re-Use
-Lab 3.1.4: AWS-Managed Policies
-Lab 3.1.5: Policy Simulator
-Lab 3.1.6: Clean Up
-Retrospective 3.1
-Question: Stack Outputs
-Task: Stack Outputs
-Lesson 3.2: Trust Relationships & Assuming Roles
-Principle 3.2
-Practice 3.2
-Lab 3.2.1: Trust Policy
-Lab 3.2.2: Explore the assumed role
-Lab 3.2.3: Add privileges to the role
-Lab 3.2.4: Clean up
-Retrospective 3.2
-Question: Inline vs Customer Managed Policies
-Question: Role Assumption
-Lesson 3.3: Fine-Grained Controls With Policies
-Principle 3.3
-Practice 3.3
-Lab 3.3.1: Unrestricted access to a service
-Lab 3.3.2: Resource restrictions
-Lab 3.3.3: Conditional restrictions
-Retrospective
-Question: Positive and Negative Tests
-Task: Positive and Negative Tests
-Question: Limiting Uploads
-Task: Limiting Uploads
-Further Reading
-Conventions
-All CloudFormation templates should be written in YAML
+# Topic 3: Identity and Access Management (IAM)
 
-Do NOT copy and paste CloudFormation templates from the Internet at large
+<!-- TOC -->
 
-DO use the CloudFormation documentation
+- [Topic 3: Identity and Access Management (IAM)](#topic-3-identity-and-access-management-iam)
+    - [Conventions](#conventions)
+    - [Lesson 3.1: Introduction to Identity and Access Management](#lesson-31-introduction-to-identity-and-access-management)
+        - [Principle 3.1](#principle-31)
+        - [Practice 3.1](#practice-31)
+            - [Lab 3.1.1: IAM Role](#lab-311-iam-role)
+            - [Lab 3.1.2: Customer Managed Policy](#lab-312-customer-managed-policy)
+            - [Lab 3.1.3: Customer Managed Policy Re-Use](#lab-313-customer-managed-policy-re-use)
+            - [Lab 3.1.4: AWS-Managed Policies](#lab-314-aws-managed-policies)
+            - [Lab 3.1.5: Policy Simulator](#lab-315-policy-simulator)
+            - [Lab 3.1.6: Clean Up](#lab-316-clean-up)
+        - [Retrospective 3.1](#retrospective-31)
+            - [Question: Stack Outputs](#question-stack-outputs)
+            - [Task: Stack Outputs](#task-stack-outputs)
+    - [Lesson 3.2: Trust Relationships & Assuming Roles](#lesson-32-trust-relationships--assuming-roles)
+        - [Principle 3.2](#principle-32)
+        - [Practice 3.2](#practice-32)
+            - [Lab 3.2.1: Trust Policy](#lab-321-trust-policy)
+            - [Lab 3.2.2: Explore the assumed role](#lab-322-explore-the-assumed-role)
+            - [Lab 3.2.3: Add privileges to the role](#lab-323-add-privileges-to-the-role)
+            - [Lab 3.2.4: Clean up](#lab-324-clean-up)
+        - [Retrospective 3.2](#retrospective-32)
+            - [Question: Inline vs Customer Managed Policies](#question-inline-vs-customer-managed-policies)
+            - [Question: Role Assumption](#question-role-assumption)
+    - [Lesson 3.3: Fine-Grained Controls With Policies](#lesson-33-fine-grained-controls-with-policies)
+        - [Principle 3.3](#principle-33)
+        - [Practice 3.3](#practice-33)
+            - [Lab 3.3.1: Unrestricted access to a service](#lab-331-unrestricted-access-to-a-service)
+            - [Lab 3.3.2: Resource restrictions](#lab-332-resource-restrictions)
+            - [Lab 3.3.3: Conditional restrictions](#lab-333-conditional-restrictions)
+        - [Retrospective](#retrospective)
+            - [Question: Positive and Negative Tests](#question-positive-and-negative-tests)
+            - [Task: Positive and Negative Tests](#task-positive-and-negative-tests)
+            - [Question: Limiting Uploads](#question-limiting-uploads)
+            - [Task: Limiting Uploads](#task-limiting-uploads)
+    - [Further Reading](#further-reading)
 
-DO utilize every link in this document; note how the AWS documentation is laid out
+<!-- /TOC -->
 
-DO use the AWS CLI for CloudFormation and IAM (NOT the Console) unless otherwise specified.
+## Conventions
 
-Lesson 3.1: Introduction to Identity and Access Management
-Principle 3.1
-Identity and Access Management (IAM) is the authentication and authorization service used to control access to virtually everything in AWS.
+- All CloudFormation templates should be written in YAML
 
-Practice 3.1
-IAM consists of a set of services and resources that allow individuals (and services) to authenticate with AWS and then authorizes those entities to perform specific activities with specific services. Like most authentication/authorization systems, IAM deals with the concepts of users, groups and permissions, but not necessarily those precise entities.
+- Do NOT copy and paste CloudFormation templates from the Internet at
+  large
 
-Lab 3.1.1: IAM Role
+- DO use the [CloudFormation documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-reference.html)
+
+- DO utilize every link in this document; note how the AWS
+  documentation is laid out
+
+- DO use the AWS CLI for
+  [CloudFormation](https://docs.aws.amazon.com/cli/latest/reference/cloudformation/index.html#)
+  and
+  [IAM](https://docs.aws.amazon.com/cli/latest/reference/iam/index.html)
+  (NOT the Console) unless otherwise specified.
+
+## Lesson 3.1: Introduction to Identity and Access Management
+
+### Principle 3.1
+
+*Identity and Access Management (IAM) is the **authentication and authorization service**
+used to control access to virtually everything in AWS.*
+
+### Practice 3.1
+
+IAM consists of a set of services and resources that allow individuals
+(and services) to authenticate with AWS and then authorizes those
+entities to perform specific activities with specific services. Like
+most authentication/authorization systems, IAM deals with the *concepts*
+of users, groups and permissions, but not necessarily those precise
+*entities*.
+
+#### Lab 3.1.1: IAM Role
+
 Create a CFN template that specifies an IAM Role.
 
-Provide values only for required attributes.
+- Provide values only for required attributes.
 
-Using inline Policies, give the Role read-only access to all IAM resources.
+- Using inline Policies, give the Role read-only access to all IAM
+  resources.
 
-Create the Stack.
+- Create the Stack.
 
-Use the awscli to query the IAM service twice:
+```yaml
+Parameters:
+  RoleName:
+    Description: Enter the role name in iamParameter.json file
+    Type: String
 
-List all the Roles
-Describe the specific Role your Stack created.
-Lab 3.1.2: Customer Managed Policy
-Update the template and the corresponding Stack to make the IAM Role's inline policy more generally usable:
+Resources:
+  AssumeRoleForIAMUser:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::744451519362:user/mr2chowd
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+```
 
-Convert the IAM Role's inline Policies array to a separate customer managed policy resource.
 
-Attach the new resource to the IAM Role.
+- Use the [awscli](https://docs.aws.amazon.com/cli/latest/reference/iam/index.html)
+  to query the IAM service twice:
 
-Update the Stack using the modified template.
+    - List all the Roles
+    - Describe the specific Role your Stack created.
 
-Lab 3.1.3: Customer Managed Policy Re-Use
-Update the template further to demonstrate reuse of the customer managed policy:
+```text
+aws iam list-role-policies --role-name RoleToAccessS3demo
+```
+#### Lab 3.1.2: Customer Managed Policy
 
-Add another IAM Role.
+Update the template and the corresponding Stack to make the IAM Role's
+inline policy more generally usable:
 
-Attach the customer managed policy resource to the new role.
+- Convert the IAM Role's inline Policies array to a separate
+  [customer managed policy](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies)
+  resource.
 
-Be sure that you're not referencing an AWS managed policy in the role.
+- Attach the new resource to the IAM Role.
 
-Add/Update the Description of the customer managed policy to indicate the re-use of the policy.
+- Update the Stack using the modified template.
 
-Update the Stack. Did the stack update work?
+#### Lab 3.1.3: Customer Managed Policy Re-Use
 
-Query the stack to determine its state.
-If the stack update was not successful, troubleshoot and determine why.
-Lab 3.1.4: AWS-Managed Policies
-Replace the customer managed policy with AWS managed policies.
+Update the template further to demonstrate reuse of the customer managed
+policy:
 
-To both roles, replace the customer managed policy reference with the corresponding AWS managed policy granting Read permissions to the IAM service.
+- Add another IAM Role.
 
-To the second role, add an additional AWS managed policy to grant Read permissions to the EC2 service.
+- Attach the customer managed policy resource to the new role.
 
-Update the stack.
+- Be sure that you're not referencing an AWS managed policy in the
+  role.
 
-Lab 3.1.5: Policy Simulator
-Read about the AWS Policy Simulator tool and practice using it.
+- Add/Update the Description of the customer managed policy to
+  indicate the re-use of the policy.
 
-Using the two roles in your stack, simulate the ability of each role to perform the following actions (using the AWS CLI):
+- Update the Stack. *Did the stack update work?*
 
-iam:CreateRole
-iam:ListRoles
-iam:SimulatePrincipalPolicy
-ec2:DescribeImages
-ec2:RunInstances
-ec2:DescribeSecurityGroups
-Lab 3.1.6: Clean Up
+    - Query the stack to determine its state.
+    - If the stack update was not successful,
+      [troubleshoot and determine why](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement).
+
+#### Lab 3.1.4: AWS-Managed Policies
+
+Replace the customer managed policy with
+[AWS managed policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-vs-inline.html#aws-managed-policies).
+
+- To both roles, replace the customer managed policy reference with
+  the corresponding AWS managed policy granting Read permissions to
+  the IAM service.
+
+- To the second role, add an additional AWS managed policy to grant
+  Read permissions to the EC2 service.
+
+- Update the stack.
+
+#### Lab 3.1.5: Policy Simulator
+
+Read about the [AWS Policy Simulator](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_testing-policies.html)
+tool and practice using it.
+
+- Using the two roles in your stack, simulate the ability of each role
+  to perform the following actions (using the AWS CLI):
+
+    - `iam:CreateRole`
+    - `iam:ListRoles`
+    - `iam:SimulatePrincipalPolicy`
+    - `ec2:DescribeImages`
+    - `ec2:RunInstances`
+    - `ec2:DescribeSecurityGroups`
+
+#### Lab 3.1.6: Clean Up
+
 Clean up after yourself by deleting the stack.
 
-Retrospective 3.1
-Question: Stack Outputs
-In Lab 3.1.5, you had to determine the Amazon resource Names (ARN) of the stack's two roles in order to pass those values to the CLI function. You probably used the AWS web console to get the ARN for each role. What could you have done to your CFN template to make that unnecessary?
+### Retrospective 3.1
 
-Task: Stack Outputs
-Institute that change from the Question above. Recreate the stack as per Lab 3.1.5, and demonstrate how to retrieve the ARNs.
+#### Question: Stack Outputs
 
-Lesson 3.2: Trust Relationships & Assuming Roles
-Principle 3.2
-AWS service roles and other IAM principals can assume customer created roles, enabling a principle-of-least-privilege of permissions for AWS services and applications.
+_In Lab 3.1.5, you had to determine the Amazon resource Names (ARN) of the
+stack's two roles in order to pass those values to the CLI function. You
+probably used the AWS web console to get the ARN for each role. What
+could you have done to your CFN template to make that unnecessary?_
 
-Practice 3.2
-An IAM Role has two kinds of policies. The first we've worked with already and this policy type (whether inline or managed) describes permissions the role has. The second is a trust policy, describing which AWS principles (services, roles and users) are allowed to masquerade as that role.
+#### Task: Stack Outputs
 
-For example, an AWS Lambda Function requires an execution role that defines the permissions the function will have when it executes. To provide those permissions, the role must trust the AWS Lambda service to assume it, and this trust must be granted explicitly by the role.
+Institute that change from the Question above. Recreate the stack as per
+Lab 3.1.5, and demonstrate how to retrieve the ARNs.
 
-In these labs, you will use your IAM User to assume roles in order to explore policies and permissions.
+## Lesson 3.2: Trust Relationships & Assuming Roles
 
-Lab 3.2.1: Trust Policy
-Create a CFN template that creates an IAM Role and makes it possible for your User to assume that role.
+### Principle 3.2
 
-The role should reference the AWS managed policy ReadOnlyAccess.
+*AWS service roles and other IAM principals can assume customer created
+roles, enabling a principle-of-least-privilege of permissions for AWS
+services and applications.*
 
-Add a trust relationship to the role that enables your specific IAM user to assume that role.
+### Practice 3.2
 
-Create the stack.
+An IAM Role has two kinds of policies. The first we've worked with
+already and this policy type (whether inline or managed) describes
+permissions the role has. The second is a trust policy, describing which
+AWS principles (services, roles and users) are allowed to masquerade as
+that role.
 
-Using the AWS CLI, assume that new role. If this fails, take note of the error you receive, diagnose the issue and fix it.
+For example, an AWS Lambda Function requires an execution role that
+defines the permissions the function will have when it executes. To
+provide those permissions, the role must trust the AWS Lambda service to
+assume it, and this trust must be granted explicitly by the role.
 
-Hint: Instead of setting up a new profile in your ~/.aws/credentials file, use aws sts assume-role. It's a valuable mechanism you'll use often through the API, and it's good to know how to do it from the CLI as well.
+In these labs, you will use your IAM User to assume roles in order to
+explore policies and permissions.
 
-Lab 3.2.2: Explore the assumed role
+#### Lab 3.2.1: Trust Policy
+
+Create a CFN template that creates an IAM Role and makes it possible for
+your User to assume that role.
+
+- The role should reference the AWS managed policy ReadOnlyAccess.
+
+- Add a trust relationship to the role that enables your specific IAM
+  user to assume that role.
+
+```yaml
+Parameters:
+  RoleName:
+    Description: Enter the role name in iamParameter.json file
+    Type: String
+
+Resources:
+  AssumeRoleForIAMUser:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::744451519362:user/mr2chowd
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+```
+
+- Create the stack.
+
+> $ aws cloudformation create-stack --stack-name Lab-3-2-2 --template-body file://TrustPolicy.yaml --parameters file://iamParameter.json --capabilities  CAPABILITY_NAMED_IAM
+
+
+- Using the AWS CLI, assume that new role. If this fails, take note of
+  the error you receive, diagnose the issue and fix it.
+
+```
+$ aws sts assume-role --role-arn arn:aws:iam::744451519362:role/RoleToAccessS3demo --role-session-name lab3-session
+
+```
+
+*Hint: Instead of setting up a new profile in your \~/.aws/credentials
+file, use [aws sts assume-role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html#using-temp-creds-sdk-cli).
+It's a valuable mechanism you'll use often through the API, and it's good to
+know how to do it from the CLI as well.*
+
+> We have tried with following command to assume that role and found an error message:
+>
+> ```
+> $ aws sts assume-role --role-arn arn:aws:iam::928284401303:role/RoleToAccessS3demo
+> --role-session-name "roleforlab" --profile default > output.txt
+>
+> In output.txt file following data was available:
+> ```
+> AWS_ACCESS_KEY_ID= *******
+> AWS_SECRET_ACCESS_KEY= *********
+> AWS_SESSION_TOKEN= ********
+> ```
+>```
+> Then the environment variable was set to use temporary credentials
+> ```
+> $ export AWS_ACCESS_KEY_ID=******
+> $ export AWS_SECRET_ACCESS_KEY=******
+> $ export AWS_SESSION_TOKEN=********
+> ```
+> ```
+
+#### Lab 3.2.2: Explore the assumed role
+
 Test the capabilities of this new Role.
 
-Using the AWS CLI, assume that updated role and list the S3 buckets in the us-east-1 region.
+- Using the AWS CLI, assume that updated role and list the S3 buckets
+  in the us-east-1 region.
 
-Acting as this role, try to create an S3 bucket using the AWS CLI.
+> aws s3 ls
 
-Did it succeed? It should not have!
-If it succeeded, troubleshoot how Read access allowed the role to create a bucket.
-Lab 3.2.3: Add privileges to the role
-Update the CFN template to give this role the ability to upload to S3 buckets.
+- Acting as this role, try to create an S3 bucket using the AWS CLI.
 
-Create an S3 bucket.
+    - Did it succeed? It should not have!
+    - 
+  > No, we could not succeed
+    - If it succeeded, troubleshoot how Read access allowed the role
+      to create a bucket.
 
-Using either an inline policy or an AWS managed policy, provide the role with S3 full access
+#### Lab 3.2.3: Add privileges to the role
 
-Update the stack.
+Update the CFN template to give this role the ability to upload to S3
+buckets.
 
-Assuming this role again, try to upload a text file to the bucket.
+- Using either an inline policy or an AWS managed policy, provide the
+  role with S3 full access
 
-If it failed, troubleshoot the error iteratively until the role is able to upload a file to the bucket.
+```yaml
+Parameters:
+  RoleName:
+    Description: Enter the role name in iamParameter.json file
+    Type: String
 
-Lab 3.2.4: Clean up
+Resources:
+  AssumeRoleForIAMUser:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::744451519362:user/mr2chowd
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+```
+
+- Update the stack.
+
+```
+$ aws cloudformation update-stack --stack-name Lab-3-2 --template-body file://TrustPolicy.yaml --parameters file://iamParameter.json --capabiliti
+es CAPABILITY_NAMED_IAM
+```
+
+- Create an S3 bucket.
+
+> Created by: aws s3 mb s3://mochowdhury22
+
+- Assuming this role again, try to upload a text file to the bucket.
+
+> A text file "test.txt" was successfully uploaded to the created bucket:
+> ```
+> $ aws s3 cp test.txt s3://mochowdhury22
+
+>
+> $ aws s3 ls s3://mochowdhury22
+
+> ```
+
+- If it failed, troubleshoot the error iteratively until the role is
+  able to upload a file to the bucket.
+
+> NA
+
+#### Lab 3.2.4: Clean up
+
 Clean up. Take the actions necessary to delete the stack.
 
-Retrospective 3.2
-Question: Inline vs Customer Managed Policies
-In the context of an AWS User or Role, what is the difference between an inline policy and a customer managed policy? What are the differences between a customer managed policy and an AWS managed policy?
+### Retrospective 3.2
 
-Question: Role Assumption
-When assuming a role, are the permissions of the initial principal mixed with those of the role being assumed? Describe how that could easily be demonstrated with both a positive and negative testing approach.
+#### Question: Inline vs Customer Managed Policies
 
-Lesson 3.3: Fine-Grained Controls With Policies
-Principle 3.3
-AWS policies can provide fine-grained access control to specific resources using specific conditions.
+_In the context of an AWS User or Role, what is the difference between
+an inline policy and a customer managed policy? What are the differences
+between a customer managed policy and an AWS managed policy?_
 
-Practice 3.3
-So far we have only provided service-level IAM policy controls, but IAM policies generally should be more specific than that. For example, a service role for an application will generally only need read/write access to those specific resources that the application uses, and even then that resource might only be accessible under certain conditions. Actions, Resources, and Condition Keys for AWS Services introduces the topic. We'll be exploring Resource restrictions and Condition keys in this lesson.
+#### Question: Role Assumption
 
-Keep in mind that not all resource types support resource-level restrictions. See the Resource-level permissions information in AWS Services That Work with IAM for details.
+_When assuming a role, are the permissions of the initial principal
+mixed with those of the role being assumed?
+Describe how that could easily be demonstrated with both a
+[positive and negative testing](https://www.guru99.com/positive-vs-negative-testing.html)
+approach._
 
-Lab 3.3.1: Unrestricted access to a service
-Create a CFN template that generates two S3 buckets and a Role, and demonstrate you have full access to each bucket with this new role.
+## Lesson 3.3: Fine-Grained Controls With Policies
 
-Code a Role your User can assume with a customer managed policy that allows full access to the S3 service.
+### Principle 3.3
 
-Create the stack.
+*AWS policies can provide fine-grained access control to specific
+resources using specific conditions.*
 
-As your User:
+### Practice 3.3
 
-list the contents of your 2 new buckets
-> Answer: 
+So far we have only provided service-level IAM policy controls, but IAM
+policies generally should be more specific than that. For example, a
+service role for an application will generally only need read/write
+access to those specific resources that the application uses, and even
+then that resource might only be accessible under certain conditions.
+[Actions, Resources, and Condition Keys for AWS Services](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_actions-resources-contextkeys.html)
+introduces the topic. We'll be exploring Resource restrictions and
+Condition keys in this lesson.
 
-```
-aws s3 ls s3://assignment331 --recursive
+Keep in mind that not all resource types support resource-level
+restrictions. See the Resource-level permissions information in
+[AWS Services That Work with IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html)
+for details.
 
-```
+#### Lab 3.3.1: Unrestricted access to a service
 
-upload a file to each new bucket
-Assume the new role and repeat those two checks as that role.
+Create a CFN template that generates two S3 buckets and a Role, and
+demonstrate you have full access to each bucket with this new role.
 
-Lab 3.3.2: Resource restrictions
-Add a resource restriction to the role's policy that limits full access to the S3 service for just one of the two buckets and allows only read-only access to the other.
+- Code a Role your User can assume with a customer managed policy that
+  allows full access to the S3 service.
 
-Update the stack.
+- Create the stack.
 
-Assume the new role and perform these steps as that role:
+- As your User:
 
-List the contents of your 2 new buckets.
-Upload a file to each new bucket.
-Were there any errors? If so, take note of them.
+    - list the contents of your 2 new buckets
+    - upload a file to each new bucket
 
-What were the results you expected, based on the role's policy?
+- Assume the new role and repeat those two checks as that role.
 
-Lab 3.3.3: Conditional restrictions
-Add a conditional restriction to the role's policy. Provide a condition that grants list access only to objects that start with "lebowski/".
+#### Lab 3.3.2: Resource restrictions
 
-Update the stack.
+Add a resource restriction to the role's policy that limits full access
+to the S3 service for just one of the two buckets and allows only
+read-only access to the other.
 
-Assume the new role and perform the remaining directives as that role.
+- Update the stack.
 
-Try to list a file in the root of the available bucket
+- Assume the new role and perform these steps as that role:
 
-If it worked, fix your policy and update the stack until this fails.
-Try to list that same file but now with the proper object key prefix.
+    - List the contents of your 2 new buckets.
+    - Upload a file to each new bucket.
 
-If it doesn't work, troubleshoot why and fix either the role's policy or the list command syntax until you are able to list a file.
-Retrospective
-Question: Positive and Negative Tests
-Were the tests you ran for resource- and condition-specific restrictions exhaustive? Did you consider additional [positive and/or negative tests] that could be automated in order to confirm the permissions for the Role?
+*Were there any errors? If so, take note of them.*
 
-Task: Positive and Negative Tests
+*What were the results you expected, based on the role's policy?*
+
+#### Lab 3.3.3: Conditional restrictions
+
+Add a conditional restriction to the role's policy. Provide a condition
+that grants list access only to objects that start with "lebowski/".
+
+- Update the stack.
+
+- Assume the new role and perform the remaining directives as that
+  role.
+
+- Try to list a file in the root of the available bucket
+
+    - If it *worked*, fix your policy and update the stack until this
+      fails.
+
+- Try to list that same file but now with the proper object key
+  prefix.
+
+    - If it *doesn't work*, troubleshoot why and fix either the role's
+      policy or the list command syntax until you are able to
+      list a file.
+
+### Retrospective
+
+#### Question: Positive and Negative Tests
+
+_Were the tests you ran for resource- and condition-specific
+restrictions exhaustive? Did you consider additional [[positive and/or negative
+tests]](https://smartbear.com/learn/automated-testing/negative-testing/)
+that could be automated in order to confirm the permissions for the
+Role?_
+
+#### Task: Positive and Negative Tests
+
 Code at least one new positive and one new negative test.
 
-Question: Limiting Uploads
-Is it possible to limit uploads of objects with a specific prefix (e.g. starting with "lebowski/") to an S3 bucket using IAM conditions? If not, how else could this be accomplished?
+#### Question: Limiting Uploads
 
-Task: Limiting Uploads
-Research and review the best method to limit uploads with a specific prefix to an S3 bucket.
+_Is it possible to limit uploads of objects with a specific prefix (e.g.
+starting with "lebowski/") to an S3 bucket using IAM conditions? If not, how else
+could this be accomplished?_
 
-Further Reading
-Read through the IAM Best Practices and be sure you're familiar with the ideas there.
+#### Task: Limiting Uploads
+
+Research and review the best method to limit uploads with a specific prefix to
+an S3 bucket.
+
+## Further Reading
+
+- Read through the [IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
+  and be sure you're familiar with the ideas there.

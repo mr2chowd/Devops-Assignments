@@ -130,18 +130,61 @@ Create the stack:
   so that the script exits only when the CFN service has finished creating the
   stack.
 
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create EC2 to launch template resources
+Resources:
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        KeyName: fouronekey2.pem
+
+  WindowsInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-03e42a81d67097502
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: WindowsInstance
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+
+
+```
+
 - Use the AWS CLI to describe the stack's resources, then use the AWS
   CLI to describe each instance that was created.
 > Answer: 
 ```
+
 aws cloudformation describe-stack-resources \
     --stack-name ec2test
     
+aws cloudformation wait stack-create-complete --stack-name e
 aws ec2 describe-instances
 
 aws ec2 describe-instances \
   --filters "Name=tag:Name,Values=WindowsInstance"
 
+sh waiter.sh
 Resources: 
 -   https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html
 
@@ -153,6 +196,47 @@ Change the AMI ID for the Windows instance to instead launch an AMI for
 Windows Server 2012 R2:
 
 - Update your Stack.
+```yaml
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create EC2 to launch template resources
+Resources:
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+
+  WindowsInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-09e13647920b2ba1d
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: WindowsInstance
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+
+
+```
+
+            
 
 - Query the stack's events using the AWS CLI. What happened to your
   original EC2 Windows instance?
@@ -177,6 +261,7 @@ and the instance being considered eliminated altogether.
 >Answer: 
 
 ```text
+aws cloudformation delete-stack --stack-name ec2
 aws ec2 describe-instance-status \
   --filters "Name=Name,Values=WindowsInstance"
 ```
@@ -225,6 +310,60 @@ function.
 - Create a CFN Output from the newly-created EIP's IPV4 address.
 
 - Update the Stack.
+
+```yaml
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create EC2 to launch template resources
+
+Resources:
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - !GetAtt SecurityGroupUbuntu.GroupId
+
+  ElasticIpforUbuntu:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref UbuntuInstance1
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+  SecurityGroupUbuntu:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG to enable SSH and ICMP For Ubuntu
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 142.188.2.24/32
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  EIPIPV4:
+    Description: Reference for the elastic ip address
+    Value: !Ref ElasticIpforUbuntu
+    Export:
+      Name: EIP-Output
+```
 
 - Using the AWS CLI, retrieve the Stack's outputs to fetch the EIP's
   IPV4 address.
@@ -285,12 +424,67 @@ able to SSH into the instance to debug and troubleshoot issues.
 
 Can you SSH into the instance?
 
+```text
+No, only updating and recreating the stack to apply new key pair does not allow me to ssh into the instance.
+```
 - Update the CFN template to modify the ICMP-enabling Security Group,
   enabling SSH ingress on Port 22 from your IP and update the stack.
 
 Now can you SSH into your instance? If not, troubleshoot and fix the
 issue using your CFN template.
 
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create EC2 to launch template resources
+
+Resources:
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - !GetAtt SecurityGroupUbuntu.GroupId
+
+  ElasticIpforUbuntu:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref UbuntuInstance1
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+  SecurityGroupUbuntu:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG to enable SSH and ICMP For Ubuntu
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 142.188.2.24/32
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  EIPIPV4:
+    Description: Reference for the elastic ip address
+    Value: !Ref ElasticIpforUbuntu
+    Export:
+      Name: EIP-Output
+```
 ### Retrospective 5.2
 
 For more information on resolving connection issues, see the
@@ -369,6 +563,94 @@ link for video: https://www.youtube.com/watch?v=ZCHwJLqPLj8&ab_channel=StephaneM
 - Modify your CFN template so that your Launch Template installs and
   starts the CloudWatch Agent on boot-up of your Ubuntu 16.04 LTS
   Instance.
+- 
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CFN template to create EC2 to launch template resources
+
+Resources:
+  RootInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        - Ref: "IAMRole"
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        IamInstanceProfile:
+          Arn: !GetAtt
+            - RootInstanceProfile
+            - Arn
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - !GetAtt SecurityGroupUbuntu.GroupId
+
+  ElasticIpforUbuntu:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref UbuntuInstance1
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/linux/amd64/latest/AmazonCloudWatchAgent.zip
+          sudo apt install unzip
+          unzip AmazonCloudWatchAgent.zip
+          sudo ./install.sh
+          sudo wget -O /opt/aws/amazon-cloudwatch-agent/bin/config.json https://mochowdhurycw.s3.amazonaws.com/amazon-cloudwatch-agent.json
+          sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
+          sudo echo testing > /opt/aws/amazon-cloudwatch-agent/logs/test.log
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+  SecurityGroupUbuntu:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG to enable SSH and ICMP For Ubuntu
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 142.188.2.24/32
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  EIPIPV4:
+    Description: Reference for the elastic ip address
+    Value: !Ref ElasticIpforUbuntu
+    Export:
+      Name: EIP-Output
+```
 
     - Is it necessary to [apply monitoring scripts](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/mon-scripts.html)
       to send data to CloudWatch?

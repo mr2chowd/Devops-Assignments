@@ -1,7 +1,55 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description:
+Description: CFN template to create EC2 to launch template resources
+
 Resources:
-  DummyServer:
-    Type: "AWS::EC2::Instance"
+  MyLaunchTemplate1:
+    Type: "AWS::EC2::LaunchTemplate"
     Properties:
-      ImageId: ""
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          - !GetAtt SecurityGroupUbuntu.GroupId
+
+  ElasticIpforUbuntu:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref UbuntuInstance1
+
+  UbuntuInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: fouronekey2
+      ImageId: ami-0729e439b6769d6ab
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate1
+        Version: !GetAtt MyLaunchTemplate1.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: UbuntuInstance
+
+  SecurityGroupUbuntu:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG to enable SSH and ICMP For Ubuntu
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 142.188.2.24/32
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  EIPIPV4:
+    Description: Reference for the elastic ip address
+    Value: !Ref ElasticIpforUbuntu
+    Export:
+      Name: EIP-Output
+
+
+
+
+

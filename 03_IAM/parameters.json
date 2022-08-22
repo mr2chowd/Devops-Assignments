@@ -5,6 +5,6 @@
   },
   {
     "ParameterKey" : "RoleName",
-    "ParameterValue" : "assignmentrole"
+    "ParameterValue" : "RoleToAccessS3demo"
   }
 ]
