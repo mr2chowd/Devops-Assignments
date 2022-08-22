@@ -1,4 +1,4 @@
-# Topic 2: Simple Storage Service (S3)
+# Topic 22: Simple Storage Service (S3)
 
 <!-- TOC -->
 
@@ -101,22 +101,18 @@ Using "aws s3", create a bucket:
 
 - Use the us-west-2 region.
 
-- Call the bucket "izaan-_your-AWS-username_".
+- Call the bucket "name-_your-AWS-username_".
 
 > Ans:
 > ```
-> $ aws s3 mb s3://izaan-wali-admin --region us-west-2
-> make_bucket: izaan-wali-admin
->```
+> $ aws s3 mb s3://mochowdhury22 --region us-west-2
+> ```
 
 - List the contents of the bucket.
 
 > Ans:
 > ```
 > $ aws s3 ls
-> 2022-06-19 00:24:25 izaan-wali-admin
-> 2022-04-21 14:50:57 izaan-wali1323
-> 2022-03-15 20:38:04 wali1317
 > ```
 
 #### Lab 2.1.2: Upload Objects to a Bucket
@@ -130,9 +126,9 @@ Add an object to your bucket:
 > <br>
 > $ mkdir data
 > <br>
-> $ touch test1.txt
+> $ touch testa.txt
 > <br>
-> $ touch test2.txt
+> $ touch testb.txt
 
 - Copy the file to your bucket using the "aws s3" command. Find more
   than one way to upload it.
@@ -140,24 +136,21 @@ Add an object to your bucket:
 > Ans:
 > <br>
 > ```
-> $ aws s3 cp test1.txt s3://izaan-wali-admin
-> upload: .\test1.txt to s3://izaan-wali-admin/test1.txt
+> $ aws s3 cp testa.txt s3://mochowdhury22
 > 
-> $ aws s3 ls s3://izaan-wali-admin
-> 2022-06-19 11:00:10          0 test1.txt
+> $ aws s3 ls s3://mochowdhury22
+
 > ```
 >
 > Another way to upload is to use sync command:
 > ```
-> $ aws s3 sync . s3://izaan-wali-admin
-> upload: .\test2.txt to s3://izaan-wali-admin/test2.txt
-> 
-> $ aws s3 ls s3://izaan-wali-admin
-> 2022-06-19 11:00:10          0 
-> 2022-06-19 22:19:14          0 ttest1.txtest2.txt
-> ```
+> $ aws s3 sync . s3://mochowdhury22
+
 
 - List the contents of the bucket after each upload.
+>```
+> $ aws s3 ls s3://mochowdhury22
+> ```
 
 ##### Question: Copying to Top Level
 
@@ -165,7 +158,7 @@ _How would you copy the contents of the directory to the top level of your bucke
 
 > Ans: By using sync command we can copy the contents of the directory to the top level of s3 bucket:
 > ```
-> aws s3 sync directory_name s3_Bucket_name
+> aws s3 sync directory_name s3_bucketname
 > ```
 
 ##### Question: Directory Copying
@@ -173,23 +166,21 @@ _How would you copy the contents of the directory to the top level of your bucke
 _How would you copy the contents and include the directory name in the s3 object
 paths?_
 
-> Ans: To do so, we have to use directory name in source and destination (after s3 bucket name) along with --recursive option.
+> Ans: We would have to use directory name in source and destination (after s3 bucket name) along with --recursive option.
 >
 > ```
 > $ aws s3 cp testdirectory/ s3://izaan-wali-admin/testdirectory --recursive
-> upload: testdirectory\test3.txt to s3://izaan-wali-admin/testdirectory/test3.txt
-> upload: testdirectory\test4.txt to s3://izaan-wali-admin/testdirectory/test4.txt
+
 > 
 > $ aws s3 ls s3://izaan-wali-admin/testdirectory/
-> 2022-06-19 23:11:29          0 test3.txt
-> 2022-06-19 23:11:29          0 test4.txt
+
 > ```
 
 ##### Question: Object Access
 
 _[Can anyone else see your file yet](https://docs.aws.amazon.com/AmazonS3/latest/dev/s3-access-control.html)?_
 
-> Ans: No, Nobody can see my files yet.
+> Ans: No one yet
 
 For further reading, see the S3 [Access Policy Language Overview](https://docs.aws.amazon.com/AmazonS3/latest/dev/access-policy-language-overview.html).
 
@@ -197,18 +188,24 @@ For further reading, see the S3 [Access Policy Language Overview](https://docs.a
 
 _What makes "sync" a better choice than "cp" for some S3 uploads?_
 
-> Ans: sync copies whole files/directory only the first time.
-> Next time when you use sync command with the same files/directory,
-> only new changes are copied to the destination folder.
-> Where, using cp command everytime source files are copied to destination bucket/folder.
+> Ans: sync copies the directory or files only the first time. It will only ripples the new data later. On the other hand,
+> "cp" command copies all the objects in every single call regardless of being all ready in the destination
 
 #### Lab 2.1.3: Exclude Private Objects When Uploading to a Bucket
 
 Add a private file to your data directory. Then, upload the directory to your
 bucket again **without including the private file**.
 
+```text
+aws s3 sync . s3://mochowdhury22/ --exclude 'dontupload.txt'
+
+```
 - Verify after uploading that the file doesn't exist in the bucket.
 
+```text
+aws s3 ls s3://mochowdhury22
+
+```
 - Did you find two different ways to accomplish this task? If not, make sure to
   read the [documentation on sync flags](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html).
 
@@ -217,6 +214,16 @@ bucket again **without including the private file**.
 Clean up: remove your bucket. What do you have to do before you can
 remove it?
 
+```text
+aws s3 rm s3://mochowdhury22 --recursive
+aws s3 rb s3://mochowdhury22
+
+or you can use this : 
+
+aws s3 rb s3://mochowdhury22 --force
+
+..
+```
 ### Retrospective 2.1
 
 For additional s3 commands and reference see the
@@ -242,14 +249,10 @@ directory with the "aws s3 sync" command.
   publicly readable.
 
 ```
-$ aws s3 mb s3://izaan-wali-admin
-make_bucket: izaan-wali-admin
-$ aws s3 sync data s3://izaan-wali-admin/data --acl public-read
-upload: data\test1.txt to s3://izaan-wali-admin/data/test1.txt  
-upload: data\test2.txt to s3://izaan-wali-admin/data/test2.txt  
-upload: data\testdirectory\test4.txt to s3://izaan-wali-admin/data/testdirectory/test4.txt
-upload: data\testdirectory\test3.txt to s3://izaan-wali-admin/data/testdirectory/test3.txt
-upload: data\private.txt to s3://izaan-wali-admin/data/private.txt
+$ aws s3 mb s3://mochowdhury22
+
+$ aws s3 sync data s3://mochowdhury22/data --acl public-read
+
 ```
 
 ##### Question: Downloading Protection
@@ -271,8 +274,8 @@ _How could you use "aws s3 cp" or "aws s3 sync" command to modify the
 permissions on the file?_
 
 ```
-$ aws s3 cp data/private.txt s3://izaan-wali-admin/data/private.txt --acl private
-upload: data\private.txt to s3://izaan-wali-admin/data/private.txt
+$ aws s3 cp data/private.txt s3://mochowdhury22/data/private.txt --acl private
+
 ```
 
 (Hint: see the list of [Canned ACLs](https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl).)
@@ -281,26 +284,20 @@ upload: data\private.txt to s3://izaan-wali-admin/data/private.txt
 
 _Is there a way you can change the permissions on the file without re-uploading it?_
 
-> Ans: Yes,by using s3 ali command. For example, to change the access of private.txt we can run the fillowing command:
-> $ aws s3api put-object-acl --bucket izaan-wali-admin --key private.txt --acl public-read
+> Ans: S3 api will do the work :
+> $ aws s3api put-object-acl --bucket mochowdhury22 --key private.txt --acl public-read
 
 #### Lab 2.2.3: Using the API from the CLI
 
 The [aws s3api command](https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html#s3api)
-gives you a lot more options. Remove the bucket again, then recreate it
+gives you more options. Remove the bucket again, then recreate it
 to start fresh.
 
 ```
 $ aws s3api create-bucket --bucket izaan-wali-admin2 --acl public-read
-{
-    "Location": "/izaan-wali-admin2"
-}
-$ aws s3 cp data s3://izaan-wali-admin2 --recursive
-upload: data\test2.txt to s3://izaan-wali-admin2/test2.txt
-upload: data\testdirectory\test4.txt to s3://izaan-wali-admin2/testdirectory/test4.txt
-upload: data\test1.txt to s3://izaan-wali-admin2/test1.txt       
-upload: data\testdirectory\test3.txt to s3://izaan-wali-admin2/testdirectory/test3.txt
-upload: data\private.txt to s3://izaan-wali-admin2/private.txt
+
+$ aws s3 cp data s3://mochowdhury22-admin --recursive
+
 ```
 
 > Note: 'copy-object' command of s3api only creates a copy of an object that is already stored in Amazon S3.
@@ -315,16 +312,8 @@ authenticated user:
 ![plot](images/1.JPG)
 
 ```
-$ aws iam attach-user-policy --user-name Admin --policy-arn arn:aws:iam::928284401303:policy/IAM_MaintPolicy_izaan_wali_admin2
+$ aws iam attach-user-policy --user-name Admin --policy-arn arn:aws:iam::92584401303:policy/IAM_MaintPolicy_mochowdhury22_admin
 $ aws iam list-attached-user-policies --user-name Admin
-{
-    "AttachedPolicies": [
-        {
-            "PolicyName": "IAM_MaintPolicy_izaan_wali_admin2",
-            "PolicyArn": "arn:aws:iam::928284401303:policy/IAM_MaintPolicy_izaan_wali_admin2"
-        }
-    ]
-}
 
 ```
 - Set a bucket policy to grant public read access.
@@ -342,7 +331,7 @@ $ aws iam list-attached-user-policies --user-name Admin
         "s3:List*"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:s3:::izaan-wali-admin2/*",
+      "Resource": "arn:aws:s3:::mochowdhury22-admin/*",
       "Principal": "*"
     },
     {
@@ -352,10 +341,10 @@ $ aws iam list-attached-user-policies --user-name Admin
         "s3:Delete*"
       ],
       "Effect": "Deny",
-      "Resource": "arn:aws:s3:::izaan-wali-admin2/*",
+      "Resource": "arn:aws:s3:::mochowdhury22-admin/*",
       "Condition": {
         "StringNotEqualsIgnoreCase": {
-          "aws:PrincipalArn": "arn:aws:iam::xxxxxxxxxxxx:user/Admin"
+          "aws:PrincipalArn": "arn:aws:iam::{fill_id_here}:user/Admin"
         }
       },
       "Principal": "*"
@@ -367,35 +356,15 @@ $ aws iam list-attached-user-policies --user-name Admin
 ```
 $ aws s3api put-bucket-policy --bucket izaan-wali-admin2 --policy file://s3BucketPolicy.json
 $ aws s3api get-bucket-policy --bucket izaan-wali-admin2
-{
-    "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"Policy1661032868308\",\"Statement\":[{\"Sid\":\"PublicRead\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"
-s3:Get*\",\"s3:List*\"],\"Resource\":\"arn:aws:s3:::izaan-wali-admin2/*\"},{\"Sid\":\"DenyOtherAction\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":[\"s3:Put*\",
-\"s3:Delete*\"],\"Resource\":\"arn:aws:s3:::izaan-wali-admin2/*\",\"Condition\":{\"StringNotEqualsIgnoreCase\":{\"aws:PrincipalArn\":\"arn:aws:iam::xxxxxxxxxxxx:user/Ad
-min\"}}}]}"
-}
+
 ```
 - Set an S3 ACL on "private.txt" to block read access unless you're
   authenticated.
 
 ```
-$ aws s3api put-object-acl --bucket izaan-wali-admin2 --key private.txt --acl private
-$ aws s3api get-object-acl --bucket izaan-wali-admin2 --key private.txt
-{
-    "Owner": {
-        "DisplayName": "wali27jcc",
-        "ID": "015ab8b401416eb51ed0ee527c1f10aa4c55056639915c391ff2d7c944ae51a5"
-    },
-    "Grants": [
-        {
-            "Grantee": {
-                "DisplayName": "wali27jcc",
-                "ID": "015ab8b401416eb51ed0ee527c1f10aa4c55056639915c391ff2d7c944ae51a5",
-                "Type": "CanonicalUser"
-            },
-            "Permission": "FULL_CONTROL"
-        }
-    ]
-}
+$ aws s3api put-object-acl --bucket mochowdhury22-admin --key private.txt --acl private
+$ aws s3api get-object-acl --bucket mochowdhury22-admin --key private.txt
+
 ```
 When you're done, verify that anybody (e.g. you, unauthenticated) can
 read most files but can't read "private.txt", and only you can modify
@@ -424,11 +393,11 @@ using a single bucket policy.
 Description: This is a simple format to create a s3 bucket
 Parameters:
   NameYourBucket:
-    Description: Please enter the name of your Bucket in initial-parameters.json file
+    Description: Please enter the name of your Bucket in parameters.json file
     Type: String
 
   MyPreferredRegion:
-    Description: Please enter your preferred region in initial-parameters.json file
+    Description: Please enter your preferred region in parameters.json file
     Type: String
     AllowedValues:
       - us-east-1
@@ -498,7 +467,7 @@ Resources:
                 - - !GetAtt S3Bucket.Arn
                   - '/private.txt'
             Principal:
-              AWS: arn:aws:iam::xxxxxxxxxxxx:user/Admin
+              AWS: arn:aws:iam::{fill_id}:user/Admin
 ```
 
 When you're done, verify your access again.
@@ -552,11 +521,11 @@ this lab:
 Description: This is a simple format to create a s3 bucket
 Parameters:
   NameYourBucket:
-    Description: Please enter the name of your Bucket in initial-parameters.json file
+    Description: PPlease enter the name of your Bucket in parameters.json file
     Type: String
 
   MyPreferredRegion:
-    Description: Please enter your preferred region in initial-parameters.json file
+    Description: Please enter the name of your Bucket in parameters.json file
     Type: String
     AllowedValues:
       - us-east-1
@@ -627,7 +596,7 @@ Resources:
                 - - !GetAtt S3Bucket.Arn
                   - '/private.txt'
             Principal:
-              AWS: arn:aws:iam::928284401303:user/Admin
+              AWS: arn:aws:iam::{id_input}:user/Admin
 ```
 ![plot](images/2.JPG)
 
@@ -639,13 +608,12 @@ Resources:
 
 Delete one of the objects that you changed.
 
-> Ans: After deleting test1.txt I can see that as delete marker.
 
 ##### Question: Deleted Object Versions
 
 _Can you still retrieve old versions of the object you removed?_
 
-> Ans: Yes, it can be retrieved by deleting the delete marker
+> Ans: Yes
 
 ##### Question: Deleting All Versions
 
@@ -675,8 +643,8 @@ through the CLI or the console.
 }
 ```
 ```
-$ aws s3api put-bucket-tagging --bucket izaan-wali-admin2 --tagging file://bucket-tagging.json
-$ aws s3api get-bucket-tagging --bucket izaan-wali-admin2
+$ aws s3api put-bucket-tagging --bucket bu_name --tagging file://bucket-tagging.json
+$ aws s3api get-bucket-tagging --bucket bu_name
 {
     "TagSet": [
         {
