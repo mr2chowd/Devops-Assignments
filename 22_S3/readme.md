@@ -169,10 +169,10 @@ paths?_
 > Ans: We would have to use directory name in source and destination (after s3 bucket name) along with --recursive option.
 >
 > ```
-> $ aws s3 cp testdirectory/ s3://izaan-wali-admin/testdirectory --recursive
+> $ aws s3 cp testdirectory/ s3://mochowdhury2022/testdirectory --recursive
 
 > 
-> $ aws s3 ls s3://izaan-wali-admin/testdirectory/
+> $ aws s3 ls s3://mochowdhury2022/testdirectory/
 
 > ```
 
@@ -294,7 +294,7 @@ gives you more options. Remove the bucket again, then recreate it
 to start fresh.
 
 ```
-$ aws s3api create-bucket --bucket izaan-wali-admin2 --acl public-read
+$ aws s3api create-bucket --bucket mochowdhury2022 --acl public-read
 
 $ aws s3 cp data s3://mochowdhury22-admin --recursive
 
@@ -354,8 +354,8 @@ $ aws iam list-attached-user-policies --user-name Admin
 ```
 
 ```
-$ aws s3api put-bucket-policy --bucket izaan-wali-admin2 --policy file://s3BucketPolicy.json
-$ aws s3api get-bucket-policy --bucket izaan-wali-admin2
+$ aws s3api put-bucket-policy --bucket mochowdhury2022 --policy file://s3BucketPolicy.json
+$ aws s3api get-bucket-policy --bucket mochowdhury2022
 
 ```
 - Set an S3 ACL on "private.txt" to block read access unless you're
