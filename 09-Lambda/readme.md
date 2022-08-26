@@ -128,13 +128,106 @@ Using API gateway to run a Lambda function.
     - `AWS::ApiGateway::Deployment`
     - Lambda execution role (`AWS::IAM::Role`) with an AssumeRole policy
     - Appropriate Lambda invoke permissions (`AWS::Lambda::Permission`)
-
-- Use the AWS CLI to call the API gateway which will call your Lambda
-  function.
+    - - Use the AWS CLI to call the API gateway which will call your Lambda
+        function.
 
 - Lambdas can take a payload like JSON as input. Rewrite the function
   to take a JSON payload and simply return the payload, or an item
   from the payload.
+> Answer
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Simple Lambda function from Cloudformation
+Resources:
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: HelloLambdaFunction1
+      Handler: index.handler
+      Runtime: python3.9
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              # TODO implement
+              return print("Hello AWS!"),print(event)
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      #      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: lambda-api-test
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: 'resources'
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ResourceId: !Ref ApiGatewayResource
+      RestApiId: !Ref ApiGatewayRestApi
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: POST
+      MethodResponses:
+        - StatusCode: 200
+      Integration:
+        Type: AWS
+        IntegrationResponses:
+          - StatusCode: 200
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations'
+
+  #
+  APIGatewayPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt Function.Arn
+      Principal: apigateway.amazonaws.com
+    DependsOn:
+      - ApiGatewayDeployment
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiGatewayMethod
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref ApiGatewayRestApi
+
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: AppendToLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+```
+
 
 #### Lab 9.1.3: Lambda & CloudFormation with awscli
 
@@ -151,6 +244,9 @@ Use the AWS CLI to create Lambda functions:
 - Use the API gateway to make a test call to the lambda to confirm
   it's working.
 
+```yaml
+
+```
 ### Retrospective 9.1
 
 #### Task

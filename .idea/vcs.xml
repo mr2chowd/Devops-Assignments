@@ -2,6 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/All_CI-CD/Django_app" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/All_CI-CD/Django_app/Django_app" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/All_CI-CD/Django_project/Django_app" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/CI-CD-Pipeline" vcs="Git" />
   </component>
 </project>
